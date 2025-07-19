@@ -1,5 +1,7 @@
 .App {
-  text-align: center;
+  min-height: 100vh;
+  background: #f6f8fa;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
 }
 
 .App-logo {
@@ -13,15 +15,42 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+
+.navbar {
+  background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 60%, #fdbb2d 100%);
+  color: #fff;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(30,136,229,0.08);
+}
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.navbar-links a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 2rem;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+.navbar-links a:hover {
+  color: #ffd600;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  text-align: center;
+  color: #1e88e5;
+  margin-bottom: 2rem;
 }
 
 .App-link {
@@ -35,4 +64,95 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Responsive Navbar & Drawer */
+.desktop-only {
+  display: flex;
+}
+.mobile-only {
+  display: none;
+}
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    z-index: 1002;
+  }
+  .navbar {
+    position: relative;
+  }
+}
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  gap: 5px;
+}
+.hamburger .bar {
+  width: 28px;
+  height: 4px;
+  background: #1a2a6c;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 280px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 16px rgba(30,136,229,0.10);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  z-index: 1001;
+  transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.drawer.open {
+  right: 0;
+}
+.drawer a, .drawer button {
+  margin: 1rem 0;
+  font-size: 1.15rem;
+  color: #1a2a6c;
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 0;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.drawer a:hover, .drawer button:hover {
+  color: #b21f1f;
+}
+.close-btn {
+  align-self: flex-end;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #b21f1f;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30,136,229,0.08);
+  z-index: 1000;
 }

@@ -1,3 +1,31 @@
+# Sabari Cars - Refurbished Cars Seller Website
+
+This is a React website for Sabari Cars, a refurbished cars seller. The site lists available cars with images, model, year, price, and description. Built with Create React App.
+
+## Features
+- Modern, clean UI
+- Navigation bar
+- List of available cars (image, model, year, price, description)
+- Responsive design
+
+## Getting Started
+
+### Install dependencies
+```
+npm install
+```
+
+### Start the development server
+```
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+---
+
+Below is the default Create React App documentation:
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

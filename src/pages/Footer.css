@@ -1,0 +1,80 @@
+.main-footer {
+  width: 100%;
+  background: #f3f4f6;
+  color: #222;
+  padding: 18px 0 10px 0;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', Arial, sans-serif;
+  margin-top: 40px;
+}
+.footer-actions {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+.footer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 1.08rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  background: #fff;
+  color: #2563eb;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.footer-btn.call {
+  border: 1px solid #90caf9;
+}
+.footer-btn.whatsapp {
+  color: #25d366;
+  border: 1px solid #a5d6a7;
+}
+.footer-btn:hover {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.footer-btn.whatsapp:hover {
+  background: #e8f5e9;
+  color: #128c7e;
+}
+.footer-icon {
+  font-size: 1.2rem;
+}
+.footer-info {
+  font-size: 0.98rem;
+  color: #555;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.crafted {
+  font-style: italic;
+  color: #1976d2;
+}
+@media (max-width: 600px) {
+  .main-footer {
+    font-size: 0.95rem;
+    padding: 14px 0 8px 0;
+  }
+  .footer-actions {
+    gap: 10px;
+  }
+  .footer-btn {
+    padding: 7px 10px;
+    font-size: 1rem;
+  }
+  .footer-info {
+    gap: 8px;
+    font-size: 0.92rem;
+  }
+}
