@@ -1,39 +1,42 @@
 import React from 'react';
-import CarList from './CarList';
-import cars from './carsData';
+import Categories from './Categories';
+import VehicleList from '../components/VehicleList';
+import '../components/VehicleList.css';
+import { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { collectionGroup, getDocs } from 'firebase/firestore';
 import './Page.css';
 
-function Home() {
+function Home({ searchResults }) {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!searchResults) {
+      setLoading(true);
+      const fetchVehicles = async () => {
+        const querySnapshot = await getDocs(collectionGroup(db, 'vehicles'));
+        const items = [];
+        querySnapshot.forEach(doc => {
+          items.push({ id: doc.id, ...doc.data() });
+        });
+        setVehicles(items);
+        setLoading(false);
+      };
+      fetchVehicles();
+    }
+  }, [searchResults]);
+
+  const vehiclesToShow = searchResults || vehicles;
+
   return (
     <div className="page-container">
-     
-      
-      <div className="filter-bar">
-        <div className="filter-options">
-          <select className="filter-select">
-            <option>All Makes</option>
-            <option>BMW</option>
-            <option>Mercedes</option>
-            <option>Audi</option>
-          </select>
-          <select className="filter-select">
-            <option>All Models</option>
-            <option>Sedan</option>
-            <option>SUV</option>
-            <option>Coupe</option>
-          </select>
-          <select className="filter-select">
-            <option>Price Range</option>
-            <option>Under $20,000</option>
-            <option>$20,000 - $40,000</option>
-            <option>Over $40,000</option>
-          </select>
-        </div>
-        <button className="reset-filters">Reset Filters</button>
-      </div>
-      
-      <CarList cars={cars} />
-      
+      <h2>Available Vehicles</h2>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <VehicleList vehicles={vehiclesToShow} />
+      )}
       <div className="cta-section">
         <h3>Can't find what you're looking for?</h3>
         <button className="cta-button">Contact Our Specialists</button>

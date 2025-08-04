@@ -1,0 +1,111 @@
+.profile-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.07);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  max-width: 370px;
+  margin: 2rem auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 320px;
+}
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5f6fa 60%, #f0f4ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.profile-avatar img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #eee;
+}
+.profile-details {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+.profile-name {
+  font-size: 1.18rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #232323;
+}
+.profile-email {
+  font-size: 0.97rem;
+  color: #666;
+  margin-bottom: 0.7rem;
+  word-break: break-all;
+}
+.login-btn, .signup-btn, .logout-btn {
+  padding: 0.55rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  margin: 0 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.login-btn {
+  background: #007bff;
+  color: #fff;
+}
+.login-btn:hover {
+  background: #0056b3;
+}
+.signup-btn {
+  background: #f5f6fa;
+  color: #007bff;
+  border: 1px solid #c7d2fe;
+}
+.signup-btn:hover {
+  background: #e9ecfa;
+  color: #0056b3;
+}
+.logout-btn {
+  background: #ff7043;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+.logout-btn:hover {
+  background: #d84315;
+}
+.profile-settings {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+  text-align: left;
+}
+.profile-settings h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .profile-card {
+    max-width: 98vw;
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+  }
+  .profile-avatar img {
+    width: 56px;
+    height: 56px;
+  }
+}
