@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { auth, db } from '../firebase';
+import { auth, db, executeRecaptcha } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
-import { collection, setDoc, doc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import './Auth.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,21 +12,30 @@ function Login() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
+  const checkProfileAndNavigate = async (user) => {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const data = userDoc.exists() ? userDoc.data() : {};
+    if (!data.name || !data.phone) {
+      navigate('/profile-complete');
+    } else {
+      setSuccess('Login successful!');
+      navigate('/');
+    }
+  };
+
   const handleGoogleLogin = async () => {
     setError('');
     setSuccess('');
     try {
+      // Execute reCAPTCHA before Google login
+      const token = await executeRecaptcha('GOOGLE_LOGIN');
+      if (!token) {
+        throw new Error('reCAPTCHA verification failed');
+      }
+
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // Store user in Firestore
-      await setDoc(doc(collection(db, 'users'), result.user.uid), {
-        name: result.user.displayName,
-        email: result.user.email,
-        phone: result.user.phoneNumber || '',
-        createdAt: new Date()
-      });
-      setSuccess('Login successful!');
-      navigate('/');
+      await checkProfileAndNavigate(result.user);
     } catch (err) {
       setError(err.message);
     }
@@ -37,9 +46,14 @@ function Login() {
     setError('');
     setSuccess('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setSuccess('Login successful!');
-      navigate('/');
+      // Execute reCAPTCHA before login
+      const token = await executeRecaptcha('LOGIN');
+      if (!token) {
+        throw new Error('reCAPTCHA verification failed');
+      }
+      
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await checkProfileAndNavigate(result.user);
     } catch (err) {
       setError(err.message);
     }

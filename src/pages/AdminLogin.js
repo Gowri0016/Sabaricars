@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import './Admin.css';
 import { useNavigate } from 'react-router-dom';
 
 function AdminLogin() {
@@ -29,13 +30,54 @@ function AdminLogin() {
 
   return (
     <div className="admin-login-container">
-      <h2>Admin Login</h2>
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Admin Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Login</button>
-        {error && <div className="error-message">{error}</div>}
-      </form>
+      <div className="login-box">
+        <div className="login-header">
+          <div className="logo">🚗</div>
+          <h2>Admin Login</h2>
+          <p>Enter your credentials to access the admin panel</p>
+        </div>
+        
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label>Email Address</label>
+            <div className="input-group">
+              <span className="input-icon">📧</span>
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <div className="input-group">
+              <span className="input-icon">🔒</span>
+              <input 
+                type="password" 
+                placeholder="Enter your password" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="login-button">
+            Login to Dashboard
+          </button>
+
+          {error && (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              {error}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

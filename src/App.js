@@ -3,6 +3,7 @@ import './pages/Auth.css';
 import './pages/Page.css';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Home, About, Contact, Login, Signup } from './pages';
+import ProfileComplete from './pages/ProfileComplete';
 import VehicleDetails from './pages/VehicleDetails';
 import AdminLogin from './pages/AdminLogin';
 import AdminPanel from './pages/AdminPanel';
@@ -97,6 +98,7 @@ function App() {
             <Route path="/admin/add-vehicle" element={<AddVehicle />} />
             <Route path="/register-admin" element={<RegisterAdmin />} />
             <Route path="/search" element={<Search onSearch={handleSearch} />} />
+            <Route path="/profile-complete" element={<ProfileComplete />} />
           </Routes>
         </main>
         <Footer />

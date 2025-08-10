@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import VehicleList from '../components/VehicleList';
-import './Page.css';
+import './Categories.css';
 
 function Categories() {
   const [categories, setCategories] = useState([]);

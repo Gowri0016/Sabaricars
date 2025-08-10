@@ -1,0 +1,99 @@
+/* Modern, professional styles for Categories page */
+
+.categories-container.modern-categories {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(60,60,60,0.13);
+  padding: 32px 40px 40px 40px;
+  transition: box-shadow 0.2s;
+}
+
+.categories-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #1a2236;
+  margin-bottom: 24px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.categories-list.categories-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0 auto 32px auto;
+  padding: 0;
+  list-style: none;
+  max-width: 400px;
+}
+
+.category-list-item {
+  background: linear-gradient(90deg, #e3e9ff 0%, #f7f9fb 100%);
+  border-radius: 12px;
+  padding: 18px 28px;
+  font-size: 1.2rem;
+  color: #2d3559;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 12px 0 rgba(60,60,60,0.07);
+  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.15s;
+  border: 2px solid transparent;
+}
+.category-list-item:hover, .category-list-item.selected {
+  background: linear-gradient(90deg, #5b8df6 0%, #c1d3fe 100%);
+  color: #fff;
+  transform: translateY(-2px) scale(1.03);
+  border: 2px solid #5b8df6;
+  box-shadow: 0 4px 20px 0 rgba(91,141,246,0.13);
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #5b8df6;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin: 32px auto;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.category-vehicles-section {
+  margin-top: 36px;
+  background: #f7f9fb;
+  border-radius: 14px;
+  padding: 28px 24px;
+  box-shadow: 0 2px 12px 0 rgba(60,60,60,0.10);
+}
+.category-vehicles-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a2236;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .categories-container.modern-categories {
+    padding: 16px 6px 24px 6px;
+  }
+  .categories-title {
+    font-size: 1.3rem;
+  }
+  .categories-list.categories-list-vertical {
+    max-width: 100%;
+    gap: 11px;
+  }
+  .category-list-item {
+    padding: 12px 10px;
+    font-size: 1rem;
+  }
+  .category-vehicles-section {
+    padding: 13px 4px;
+  }
+}

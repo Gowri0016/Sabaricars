@@ -16,6 +16,28 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-export const getRecaptchaVerifier = (containerId) => new RecaptchaVerifier(containerId, { size: 'invisible' }, auth);
+export const executeRecaptcha = async (action) => {
+  try {
+    return new Promise((resolve, reject) => {
+      window.grecaptcha.enterprise.ready(() => {
+        window.grecaptcha.enterprise.execute('6Lf-e6ArAAAAAENIq9ijVGxBSXUyPutoAH_3jJbK', {
+          action: action
+        })
+        .then(resolve)
+        .catch(reject);
+      });
+    });
+  } catch (error) {
+    console.error('reCAPTCHA execution failed:', error);
+    throw error;
+  }
+};
+
+export const getRecaptchaVerifier = (containerId) => {
+  return new RecaptchaVerifier(auth, containerId, {
+    size: 'invisible'
+  });
+};

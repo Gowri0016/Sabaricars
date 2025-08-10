@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import './Admin.css';
 import { collection, addDoc } from 'firebase/firestore';
 
 
 function AddCategory() {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   // const [image, setImage] = useState(null); // Temporarily disabled
   const [loading, setLoading] = useState(false);
@@ -29,14 +32,53 @@ function AddCategory() {
 
   return (
     <div className="add-category-container">
-      <h2>Add Category</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Category Name" value={name} onChange={e => setName(e.target.value)} required />
-        {/* <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} /> */}
-        <button type="submit" disabled={loading}>Add Category</button>
-        {success && <div className="success-message">{success}</div>}
-        {error && <div className="error-message">{error}</div>}
-      </form>
+      <div className="category-form-box">
+        <div className="page-header">
+          <button onClick={() => navigate('/admin')} className="back-button">
+            <span className="back-arrow">←</span> Back
+          </button>
+          <div className="form-header">
+            <h2>Add New Category</h2>
+            <p>Create a new vehicle category</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modern-form">
+          <div className="form-group">
+            <label>Category Name</label>
+            <div className="input-group">
+              <span className="input-icon">🏷️</span>
+              <input 
+                type="text" 
+                placeholder="Enter category name" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" disabled={loading} className="submit-button">
+              {loading ? 'Adding Category...' : 'Add Category'}
+            </button>
+          </div>
+
+          {success && (
+            <div className="success-message">
+              <span className="success-icon">✅</span>
+              {success}
+            </div>
+          )}
+          
+          {error && (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              {error}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

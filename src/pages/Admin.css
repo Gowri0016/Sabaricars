@@ -1,0 +1,477 @@
+/* Common styles for admin pages */
+.admin-login-container,
+.add-vehicle-container,
+.add-category-container,
+.admin-panel-container {
+  max-width: 1200px;
+  margin: 1rem auto;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .admin-login-container,
+  .add-vehicle-container,
+  .add-category-container,
+  .admin-panel-container {
+    margin: 0.5rem auto;
+    padding: 0.75rem;
+  }
+}
+
+/* Modern Form Styles */
+.modern-form {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-header {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.back-arrow {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-top: 2.5rem;
+}
+
+.form-header h2 {
+  color: #2c3e50;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-header p {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .back-button {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .form-header {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-form {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .form-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-header p {
+    font-size: 0.85rem;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+@media (max-width: 768px) {
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.625rem;
+    font-size: 0.95rem;
+  }
+  
+  /* Increase touch target size for better mobile usability */
+  .form-group select {
+    background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center;
+    background-size: 8px 10px;
+    padding-right: 2rem;
+  }
+}
+
+/* File input styling */
+.file-input-container {
+  position: relative;
+}
+
+.file-input-container input[type="file"] {
+  display: none;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-input-label:hover {
+  background: #2980b9;
+}
+
+.file-count {
+  margin-left: 1rem;
+  color: #7f8c8d;
+}
+
+/* Button styles */
+.submit-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .submit-button {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    min-height: 44px; /* Minimum touch target size */
+  }
+}
+
+.submit-button:hover {
+  background: #2980b9;
+}
+
+.submit-button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Message styles */
+.success-message,
+.error-message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Admin Panel Styles */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.admin-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .admin-card {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+}
+
+.admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.admin-card h3 {
+  margin: 0.5rem 0;
+  color: #2c3e50;
+}
+
+.admin-card p {
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* Admin Login Styles */
+.login-box {
+  max-width: 400px;
+  width: 90%;
+  margin: 1rem auto;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-header .logo {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .login-box {
+    width: 95%;
+    padding: 1.25rem;
+    margin: 0.5rem auto;
+    border-radius: 8px;
+  }
+
+  .login-header {
+    margin-bottom: 1rem;
+  }
+
+  .login-header .logo {
+    font-size: 2rem;
+  }
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.input-group input {
+  padding-left: 3rem !important;
+}
+
+.login-button {
+  width: 100%;
+  padding: 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.login-button:hover {
+  background: #2980b9;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Prevent zoom on input focus in iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Better touch targets for mobile */
+  .input-group input,
+  .input-group select,
+  button,
+  .file-input-label {
+    min-height: 44px;
+  }
+
+  /* Improved spacing for mobile */
+  .form-actions {
+    margin-top: 1.5rem;
+  }
+
+  /* Better file input handling for mobile */
+  .file-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .file-input-label {
+    text-align: center;
+    width: 100%;
+  }
+
+  .file-count {
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Improved message display for mobile */
+  .success-message,
+  .error-message {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
+
+  /* Better card touch feedback */
+  .admin-card:active {
+    transform: scale(0.98);
+  }
+
+  /* Remove hover effects on mobile */
+  .submit-button:hover,
+  .login-button:hover,
+  .file-input-label:hover,
+  .admin-card:hover {
+    transform: none;
+  }
+
+  /* Sticky form actions */
+  .form-actions {
+    position: sticky;
+    bottom: 1rem;
+    background: white;
+    padding: 1rem;
+    margin: 1rem -1rem -1rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 -4px 6px rgba(0,0,0,0.05);
+  }
+}
