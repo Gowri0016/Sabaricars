@@ -3,6 +3,8 @@ import './pages/Auth.css';
 import './pages/Page.css';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Home, About, Contact, Login, Signup } from './pages';
+import RequestVehicle from './pages/RequestVehicle';
+import SellVehicle from './pages/SellVehicle';
 import ProfileComplete from './pages/ProfileComplete';
 import VehicleDetails from './pages/VehicleDetails';
 import AdminLogin from './pages/AdminLogin';
@@ -12,9 +14,9 @@ import AddVehicle from './pages/AddVehicle';
 import RegisterAdmin from './pages/RegisterAdmin';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
-import Search from './pages/Search';
 import Categories from './pages/Categories';
 import Footer from './pages/Footer';
+import SearchOverlay from './components/SearchOverlay';
 import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { auth } from './firebase';
@@ -27,24 +29,17 @@ import { AuthProvider } from './context/AuthContext';
 function App() {
   const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchResults, setSearchResults] = useState(null);
-  const [showSearch, setShowSearch] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-  const handleDrawerClose = () => setDrawerOpen(false);
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setIsSearchOpen(false);
+  };
 
-  const handleSearch = async (query) => {
-    // Sample search logic: filter vehicles by name (could be improved)
-    const querySnapshot = await getDocs(collection(db, 'vehicleDetails'));
-    const matches = [];
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.name && data.name.toLowerCase().includes(query.toLowerCase())) {
-        matches.push({ id: doc.id, ...data });
-      }
-    });
-    setSearchResults(matches);
-    setShowSearch(false);
+  const toggleSearch = (e) => {
+    e.preventDefault();
+    setIsSearchOpen(!isSearchOpen);
   };
 
   return (
@@ -59,6 +54,8 @@ function App() {
             <Link to="/profile">Profile</Link>
             <Link to="/about">About Us</Link>
             <Link to="/contact">Contact Us</Link>
+            <Link to="/request-vehicle">Request a Vehicle</Link>
+            <Link to="/sell-vehicle">Sell Your Vehicle</Link>
             {!user && <Link to="/login">Login</Link>}
             {user && <button className="logout-btn" onClick={() => auth.signOut()}>Logout</button>}
           </div>
@@ -76,14 +73,16 @@ function App() {
           <Link to="/profile" onClick={handleDrawerClose}>Profile</Link>
           <Link to="/about" onClick={handleDrawerClose}>About Us</Link>
           <Link to="/contact" onClick={handleDrawerClose}>Contact Us</Link>
+          <Link to="/request-vehicle" onClick={handleDrawerClose}>Request a Vehicle</Link>
+          <Link to="/sell-vehicle" onClick={handleDrawerClose}>Sell Your Vehicle</Link>
           {!user && <Link to="/login" onClick={handleDrawerClose}>Login</Link>}
           {user && <button className="logout-btn" onClick={() => {auth.signOut(); handleDrawerClose();}}>Logout</button>}
         </div>
         {drawerOpen && <div className="drawer-backdrop" onClick={handleDrawerClose}></div>}
-        {showSearch && <Search onSearch={handleSearch} />}
+        <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         <main>
           <Routes>
-            <Route path="/" element={<Home searchResults={searchResults} />} />
+            <Route path="/" element={<Home />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/profile" element={<Profile />} />
@@ -97,11 +96,45 @@ function App() {
             <Route path="/admin/add-category" element={<AddCategory />} />
             <Route path="/admin/add-vehicle" element={<AddVehicle />} />
             <Route path="/register-admin" element={<RegisterAdmin />} />
-            <Route path="/search" element={<Search onSearch={handleSearch} />} />
             <Route path="/profile-complete" element={<ProfileComplete />} />
+            <Route path="/request-vehicle" element={<RequestVehicle />} />
+            <Route path="/sell-vehicle" element={<SellVehicle />} />
           </Routes>
         </main>
         <Footer />
+        {/* Mobile Bottom Navigation */}
+        <div className="bottom-nav">
+          <Link to="/" className="bottom-nav-item">
+            <span className="nav-icon">🏠</span>
+            <span>Home</span>
+          </Link>
+          <Link to="/categories" className="bottom-nav-item">
+            <span className="nav-icon">📑</span>
+            <span>Categories</span>
+          </Link>
+          <div 
+            className="bottom-nav-item" 
+            onClick={(e) => {
+              e.preventDefault();
+              setIsSearchOpen(true);
+            }}
+          >
+            <span className="nav-icon">🔍</span>
+            <span>Search</span>
+          </div>
+          <Link to="/wishlist" className="bottom-nav-item">
+            <span className="nav-icon">❤️</span>
+            <span>Wishlist</span>
+          </Link>
+          <Link to="/request-vehicle" className="bottom-nav-item">
+            <span className="nav-icon">🚗</span>
+            <span>Request Vehicle</span>
+          </Link>
+          <Link to="/sell-vehicle" className="bottom-nav-item">
+            <span className="nav-icon">💸</span>
+            <span>Sell Vehicle</span>
+          </Link>
+        </div>
       </div>
     </Router>
   );

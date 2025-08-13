@@ -1,62 +1,95 @@
 /* Modern, professional styles for Categories page */
 
 .categories-container.modern-categories {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 6px 32px 0 rgba(60,60,60,0.13);
-  padding: 32px 40px 40px 40px;
-  transition: box-shadow 0.2s;
+  padding: 0 20px;
+  width: 100%;
 }
 
 .categories-title {
-  font-size: 2.1rem;
-  font-weight: 700;
-  color: #1a2236;
-  margin-bottom: 24px;
-  letter-spacing: 0.02em;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2d3559;
+  margin-bottom: 40px;
   text-align: center;
+  position: relative;
+}
+
+.categories-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: #5b8df6;
+  border-radius: 2px;
 }
 
 .categories-list.categories-list-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
   margin: 0 auto 32px auto;
   padding: 0;
   list-style: none;
-  max-width: 400px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .category-list-item {
-  background: linear-gradient(90deg, #e3e9ff 0%, #f7f9fb 100%);
-  border-radius: 12px;
-  padding: 18px 28px;
-  font-size: 1.2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px 32px;
+  font-size: 1.1rem;
   color: #2d3559;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 12px 0 rgba(60,60,60,0.07);
-  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.15s;
-  border: 2px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
 }
-.category-list-item:hover, .category-list-item.selected {
-  background: linear-gradient(90deg, #5b8df6 0%, #c1d3fe 100%);
-  color: #fff;
-  transform: translateY(-2px) scale(1.03);
-  border: 2px solid #5b8df6;
-  box-shadow: 0 4px 20px 0 rgba(91,141,246,0.13);
+
+.category-list-item span {
+  transition: color 0.2s ease;
+}
+
+.category-list-item:hover {
+  border-color: #5b8df6;
+  box-shadow: 0 2px 6px rgba(91, 141, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.category-list-item.selected {
+  background: #5b8df6;
+  border-color: #5b8df6;
+  color: #ffffff;
 }
 
 .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #5b8df6;
+  font-size: 0.9rem;
+}
+
+.loading-spinner::before {
+  content: '';
   border: 4px solid #f3f3f3;
   border-top: 4px solid #5b8df6;
   border-radius: 50%;
   width: 36px;
   height: 36px;
   animation: spin 1s linear infinite;
-  margin: 32px auto;
 }
 @keyframes spin {
   0% { transform: rotate(0deg); }
@@ -64,36 +97,126 @@
 }
 
 .category-vehicles-section {
-  margin-top: 36px;
-  background: #f7f9fb;
-  border-radius: 14px;
-  padding: 28px 24px;
-  box-shadow: 0 2px 12px 0 rgba(60,60,60,0.10);
-}
-.category-vehicles-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #1a2236;
-  margin-bottom: 20px;
-  text-align: center;
+  margin-top: 50px;
+  padding: 0 10px;
 }
 
-@media (max-width: 600px) {
-  .categories-container.modern-categories {
-    padding: 16px 6px 24px 6px;
-  }
-  .categories-title {
-    font-size: 1.3rem;
-  }
+.category-vehicles-title {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #2d3559;
+  margin-bottom: 30px;
+  text-align: center;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.category-vehicles-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: #5b8df6;
+  border-radius: 2px;
+}
+
+.error-message {
+  color: #c53030;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+}
+
+.no-content-message {
+  text-align: center;
+  color: #718096;
+  padding: 2rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  border: 1px dashed #e2e8f0;
+  border-radius: 6px;
+}
+
+.categories-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
   .categories-list.categories-list-vertical {
-    max-width: 100%;
-    gap: 11px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
   }
+
+  .categories-container.modern-categories {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categories-container.modern-categories {
+    margin: 25px auto;
+  }
+
+  .categories-title {
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+  }
+
+  .categories-list.categories-list-vertical {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
   .category-list-item {
-    padding: 12px 10px;
+    padding: 18px;
     font-size: 1rem;
+    min-height: 70px;
   }
+
   .category-vehicles-section {
-    padding: 13px 4px;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-container.modern-categories {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+
+  .categories-title {
+    font-size: 1.4rem;
+  }
+
+  .categories-list.categories-list-vertical {
+    grid-template-columns: 1fr;
+  }
+
+  .category-list-item {
+    padding: 15px;
+    min-height: 60px;
+  }
+
+  .category-vehicles-section {
+    margin-top: 30px;
+  }
+
+  .category-vehicles-title {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
   }
 }
