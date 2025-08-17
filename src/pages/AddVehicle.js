@@ -63,7 +63,7 @@ function AddVehicle() {
   return (
     <div className="add-vehicle-container">
       <div className="page-header">
-        <button onClick={() => navigate('/admin')} className="back-button">
+        <button onClick={() => navigate('/admin-panel')} className="back-button">
           <span className="back-arrow">←</span> Back
         </button>
         <div className="form-header">

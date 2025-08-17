@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
 function RegisterAdmin() {
@@ -23,8 +24,12 @@ function RegisterAdmin() {
     }
   };
 
+  const navigate = useNavigate();
   return (
     <div className="register-admin-container">
+      <button style={{marginBottom: '1rem'}} onClick={() => navigate && navigate('/admin-panel')} className="back-button">
+        <span className="back-arrow">←</span> Back
+      </button>
       <h2>Create Admin Account</h2>
       <form onSubmit={handleRegister}>
         <input type="email" placeholder="Admin Email" value={email} onChange={e => setEmail(e.target.value)} required />

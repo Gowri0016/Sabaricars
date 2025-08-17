@@ -1,13 +1,23 @@
+/* Minimal reset and polish */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+img, video { max-width: 100%; height: auto; display: block; }
+button { font-family: inherit; }
+a { color: inherit; }
+:focus { outline: none; }
+:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.35); border-radius: 6px; }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Form defaults */
+input, select, textarea, button { font: inherit; }
+label { display: inline-block; margin-bottom: 6px; }

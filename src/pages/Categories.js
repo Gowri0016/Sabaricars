@@ -55,7 +55,7 @@ function Categories() {
   };
 
   return (
-    <div className="categories-container modern-categories">
+    <div className="categories-container modern-categories container">
       <h2 className="categories-title">Browse by Category</h2>
       
       {error ? (
@@ -76,6 +76,10 @@ function Categories() {
                   key={cat.id || cat.key}
                   className={`category-list-item${selectedCategory && selectedCategory.id === cat.id ? ' selected' : ''}`}
                   onClick={() => handleCategoryClick(cat)}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selectedCategory && selectedCategory.id === cat.id}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCategoryClick(cat); } }}
                 >
                   <span>{cat.name}</span>
                 </li>

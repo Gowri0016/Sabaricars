@@ -14,7 +14,7 @@ const Footer = () => (
         <span className="nav-icon"><FiGrid /></span>
         <span className="nav-label">Categories</span>
       </Link>
-      <Link to="/search" className="nav-item" title="Search">
+      <Link to={{ pathname: '/' }} state={{ focusSearch: true }} className="nav-item" title="Search">
         <span className="nav-icon"><FiSearch /></span>
         <span className="nav-label">Search</span>
       </Link>

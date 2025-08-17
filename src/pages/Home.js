@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import VehicleList from '../components/VehicleList';
+import TopSearch from '../components/TopSearch';
 import '../components/VehicleList.css';
 import { db } from '../firebase';
 import { collectionGroup, getDocs } from 'firebase/firestore';
@@ -43,8 +44,55 @@ function Home() {
     loadVehicles();
   }, [location.state?.fromSearch]);
 
+  // Handler used by TopSearch component
+  const handleTopSearch = async (term) => {
+    if (!term) {
+      // if empty, reload all vehicles
+      setLoading(true);
+      try {
+        const querySnapshot = await getDocs(collectionGroup(db, 'vehicles'));
+        const items = [];
+        querySnapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+        setVehicles(items);
+        setSearchTerm('');
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Always fetch latest vehicles from Firestore then filter client-side
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collectionGroup(db, 'vehicles'));
+      const source = [];
+      querySnapshot.forEach(doc => source.push({ id: doc.id, ...doc.data() }));
+      const lower = term.toLowerCase();
+      const filtered = source.filter(v => {
+        return (
+          (v.make && v.make.toLowerCase().includes(lower)) ||
+          (v.model && v.model.toLowerCase().includes(lower)) ||
+          (v.name && v.name.toLowerCase().includes(lower)) ||
+          (v.year && String(v.year).includes(lower)) ||
+          (v.description && v.description.toLowerCase().includes(lower))
+        );
+      });
+      setVehicles(filtered);
+      setSearchTerm(term);
+    } catch (err) {
+      console.error('Search error', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const focusSearch = location.state && location.state.focusSearch;
+
   return (
-    <div className="page-container">
+    <div className="page-container container">
+      <TopSearch onSearch={handleTopSearch} autoFocus={!!focusSearch} />
       {searchTerm ? (
         <div className="search-results-header">
           <h2>Search Results for "{searchTerm}"</h2>
@@ -69,7 +117,7 @@ function Home() {
 
       <div className="cta-section">
         <h3>Can't find what you're looking for?</h3>
-        <button className="cta-button">Contact Our Specialists</button>
+        <button className="btn btn-primary">Contact Our Specialists</button>
       </div>
     </div>
   );

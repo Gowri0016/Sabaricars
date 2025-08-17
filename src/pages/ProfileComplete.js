@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from '../firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { auth, db, getRecaptchaVerifier } from '../firebase';
+import { signInWithPhoneNumber, getAuth } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export default function ProfileComplete() {
   const [name, setName] = useState('');
@@ -14,12 +14,90 @@ export default function ProfileComplete() {
 
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimeout, setResendTimeout] = useState(0);
+  const [recaptchaVerified, setRecaptchaVerified] = useState(false);
   const timerRef = useRef(null);
   const navigate = useNavigate();
+  // Focus states for inline focus styling
+  const [fName, setFName] = useState(false);
+  const [fCode, setFCode] = useState(false);
+  const [fPhone, setFPhone] = useState(false);
+  const [fOtp, setFOtp] = useState(false);
+  // Component-scoped UI styles to avoid external CSS conflicts
+  const ui = {
+    page: { minHeight: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', overscrollBehavior: 'contain' },
+    card: { width: '100%', maxWidth: 480, padding: 24, background: '#fff', borderRadius: 16, boxShadow: '0 10px 30px rgba(16,24,40,0.08)', border: '1px solid var(--border-200)', maxHeight: 'calc(100svh - 32px)', overflow: 'auto', WebkitOverflowScrolling: 'touch' },
+    header: { textAlign: 'center', marginBottom: 20 },
+    h2: { margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-900)' },
+    help: { marginTop: 6, fontSize: 14, color: 'var(--text-500)' },
+    stack: { display: 'flex', flexDirection: 'column', gap: 16 },
+    field: { display: 'flex', flexDirection: 'column', gap: 8 },
+    label: { fontSize: 14, color: 'var(--text-600)', fontWeight: 600 },
+    input: { height: 48, padding: '12px 14px', border: '1px solid var(--border-200)', borderRadius: 12, outline: 'none', background: '#fff', color: 'var(--text-900)', fontSize: 16 },
+    inputFocus: { border: '1px solid var(--accent-600)', boxShadow: '0 0 0 3px rgba(33,150,243,0.15)' },
+    inputGroupWrap: { display: 'flex', alignItems: 'stretch', border: '1px solid var(--border-200)', borderRadius: 12, overflow: 'visible', background: '#fff', width: '100%', position: 'relative', zIndex: 1 },
+    inputGroupFocus: { border: '1px solid var(--accent-600)', boxShadow: '0 0 0 3px rgba(33,150,243,0.15)' },
+    inputCode: { width: 56, height: 48, padding: '12px 8px', border: 'none', outline: 'none', background: '#fff', color: 'var(--text-900)', borderRight: '1px solid var(--border-200)', textAlign: 'center', fontWeight: 600, fontSize: 15 },
+    inputPhone: { flex: 1, minWidth: 0, height: 48, padding: '12px 14px', border: 'none', outline: 'none', background: '#fff', color: 'var(--text-900)', fontSize: 16 },
+    error: { color: 'var(--danger-500)', fontSize: 14 },
+    btnPrimary: { width: '100%', height: 46, border: 'none', borderRadius: 999, color: '#fff', fontWeight: 700, cursor: 'pointer', background: 'linear-gradient(90deg, var(--accent-600), var(--accent-500))', boxShadow: '0 6px 14px rgba(0,123,255,0.25)' },
+    helperRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+    linkBtn: { background: 'transparent', border: 'none', color: 'var(--accent-600)', padding: 8, fontWeight: 600, cursor: 'pointer' }
+  };
+
+  const scrollIntoViewOnFocus = (e) => {
+    try {
+      e?.target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (_) {}
+  };
+
+  // Prefill from current auth user and existing Firestore profile (if any)
+  useEffect(() => {
+    const u = auth.currentUser;
+    const apply = (data) => {
+      if (!data) return;
+      if (data.name && !name) setName(data.name);
+      const p = data.phone || data.phoneNumber; // phoneNumber may come from auth user
+      if (p && typeof p === 'string') {
+        // Expect "+<cc><number>"
+        const m = p.trim().match(/^\+(\d{1,3})(\d{5,15})$/);
+        if (m) {
+          const [, cc, local] = m;
+          if (!phone) setPhone(local);
+          if (countryCode === '+91' || countryCode === '' || countryCode === undefined) {
+            setCountryCode('+' + cc);
+          }
+        }
+      }
+    };
+
+    if (u) {
+      // From auth
+      apply({ name: u.displayName, phoneNumber: u.phoneNumber });
+      // From Firestore
+      getDoc(doc(db, 'users', u.uid)).then(snap => {
+        if (snap.exists()) apply(snap.data());
+      }).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // Cleanup verifier on unmount if it exists
+  useEffect(() => {
+    return () => {
+      try {
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+          window.recaptchaVerifier = null;
+        }
+      } catch (err) {
+        /* noop */
+      }
     };
   }, []);
 
@@ -57,48 +135,48 @@ export default function ProfileComplete() {
     }
 
     try {
-      console.log('Creating RecaptchaVerifier instance');
-      const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: (token) => {
-          console.log('reCAPTCHA callback received');
-        },
-        'error-callback': (error) => {
-          console.error('reCAPTCHA error:', error);
-          setError('reCAPTCHA verification failed');
-          setIsLoading(false);
-        }
-      });
-
-      console.log('Rendering reCAPTCHA');
-      await recaptchaVerifier.render();
-
-      console.log('Sending OTP to phone:', countryCode + phone);
+      console.log('Creating invisible reCAPTCHA to send OTP');
       const fullPhone = `${countryCode}${cleanPhone}`;
-      const confirmationResult = await signInWithPhoneNumber(auth, fullPhone, recaptchaVerifier);
-      
-      // Store confirmationResult globally
+      // ensure verifier exists
+      const authInstance = auth || getAuth();
+      // Always create a fresh invisible verifier so the badge doesn't persist across pages
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch (_) {}
+        window.recaptchaVerifier = null;
+      }
+      const params = {
+        size: 'invisible',
+        badge: 'bottomleft',
+        callback: () => setRecaptchaVerified(true),
+        'expired-callback': () => setRecaptchaVerified(false),
+      };
+      window.recaptchaVerifier = getRecaptchaVerifier('recaptcha-container', params);
+      try { await window.recaptchaVerifier.render(); } catch (e) { /* ignore */ }
+      const confirmationResult = await signInWithPhoneNumber(authInstance, fullPhone, window.recaptchaVerifier);
       window.confirmationResult = confirmationResult;
-      
       console.log('OTP sent successfully');
       setOtpSent(true);
       startTimer();
+      // Clear verifier shortly after send to minimize badge presence
+      setTimeout(() => {
+        try {
+          if (window.recaptchaVerifier) {
+            window.recaptchaVerifier.clear();
+            window.recaptchaVerifier = null;
+          }
+        } catch (_) {}
+      }, 300);
       setIsLoading(false);
-      
     } catch (error) {
       console.error('Error in sendOtp:', error);
-      setError(error.message || 'Failed to send OTP');
-      setIsLoading(false);
-      
-      // Clean up reCAPTCHA if there was an error
-      try {
-        if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.clear();
-          window.recaptchaVerifier = null;
-        }
-      } catch (cleanupError) {
-        console.error('Error cleaning up reCAPTCHA:', cleanupError);
+      if (error && error.code === 'auth/invalid-app-credential') {
+        setError('Authentication configuration error. Check Firebase API key, authorized domains and phone auth provider.');
+      } else if (error && error.code === 'auth/quota-exceeded') {
+        setError('SMS quota exceeded for this project. Try again later.');
+      } else {
+        setError(error.message || 'Failed to send OTP');
       }
+      setIsLoading(false);
     }
   };
 
@@ -175,53 +253,104 @@ export default function ProfileComplete() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(to bottom, #e0e7ff, #f0f4ff)' }}>
-      <div style={{ width: 400, background: '#fff', borderRadius: 22, boxShadow: '0 4px 24px rgba(0,0,0,0.08)', padding: 32 }}>
-        <h2 style={{ textAlign: 'center', fontWeight: 700 }}>Please complete your profile</h2>
-        <div style={{ margin: '24px 0' }}>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" className="form-control" style={{ width: '100%', marginBottom: 16, padding: 10, borderRadius: 8, border: '1px solid #ccc' }} />
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-            <input value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ width: 60, padding: 10, borderRadius: 8, border: '1px solid #ccc' }} />
-            <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone Number" type="tel" style={{ flex: 1, padding: 10, borderRadius: 8, border: '1px solid #ccc' }} />
+    <div style={ui.page}>
+      <div style={ui.card}>
+        <div style={ui.header}>
+          <h2 style={ui.h2}>Please complete your profile</h2>
+          <p style={ui.help}>We’ll verify your phone to secure your account.</p>
+        </div>
+        <div style={ui.stack}>
+          <div style={ui.field}>
+            <label htmlFor="pc-name" style={ui.label}>Name</label>
+            <input
+              id="pc-name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onFocus={() => setFName(true)}
+              onBlur={() => setFName(false)}
+              placeholder="Your full name"
+              autoComplete="name"
+              autoCapitalize="words"
+              autoCorrect="off"
+              spellCheck={false}
+              style={{ ...ui.input, ...(fName ? ui.inputFocus : null) }}
+            />
           </div>
-          {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+
+          <div style={ui.field}>
+            <label htmlFor="pc-phone" style={ui.label}>Phone</label>
+            <div style={{ ...ui.inputGroupWrap, ...((fCode || fPhone) ? ui.inputGroupFocus : null) }}>
+              <input
+                id="pc-cc"
+                value={countryCode}
+                onChange={e => setCountryCode(e.target.value)}
+                onFocus={(ev) => { setFCode(true); scrollIntoViewOnFocus(ev); }}
+                onBlur={() => setFCode(false)}
+                aria-label="Country code"
+                autoComplete="tel-country-code"
+                inputMode="tel"
+                pattern="\\+?\\d*"
+                style={ui.inputCode}
+              />
+              <input
+                id="pc-phone"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                onFocus={(ev) => { setFPhone(true); scrollIntoViewOnFocus(ev); }}
+                onBlur={() => setFPhone(false)}
+                placeholder="Enter phone number"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                enterKeyHint="send"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-label="Phone number"
+                style={ui.inputPhone}
+              />
+            </div>
+          </div>
+
+          {error && <div style={ui.error} aria-live="polite">{error}</div>}
+
           {!otpSent && (
-            <button 
-              onClick={sendOtp}
-              disabled={isLoading}
-              className="g-recaptcha"
-              data-sitekey="6Lf-e6ArAAAAAENIq9ijVGxBSXUyPutoAH_3jJbK"
-              data-callback="sendOtp"
-              data-action="SEND_OTP"
-              style={{ width: '100%', background: '#2563eb', color: '#fff', padding: 12, borderRadius: 10, border: 'none', fontWeight: 600, fontSize: 18, marginBottom: 8 }}
-            >
-              {isLoading ? 'Sending...' : 'Send OTP'}
-            </button>
-          )}
-          {otpSent && (
             <>
-              <input value={otp} onChange={e => setOtp(e.target.value)} placeholder="Enter OTP" type="number" style={{ width: '100%', marginBottom: 12, padding: 10, borderRadius: 8, border: '1px solid #ccc' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span style={{ color: resendTimeout > 0 ? 'grey' : 'blue' }}>
-                  {resendTimeout > 0 ? `Resend OTP in ${formatTime(resendTimeout)}` : `Didn't receive OTP?`}
-                </span>
-                <button onClick={resendTimeout > 0 ? null : resendOtp} disabled={resendTimeout > 0} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, cursor: resendTimeout > 0 ? 'not-allowed' : 'pointer' }}>Resend OTP</button>
-              </div>
-              <button 
-                onClick={verifyOtpAndSave}
-                disabled={isLoading}
-                className="g-recaptcha"
-                data-sitekey="6Lf-e6ArAAAAAENIq9ijVGxBSXUyPutoAH_3jJbK"
-                data-callback="verifyOtpAndSave"
-                data-action="VERIFY_OTP"
-                style={{ width: '100%', background: '#2563eb', color: '#fff', padding: 12, borderRadius: 10, border: 'none', fontWeight: 600, fontSize: 18 }}
-              >
-                {isLoading ? 'Verifying...' : 'Verify and Save'}
+              <div id="recaptcha-container" style={{ display: 'none' }}></div>
+              <button onClick={sendOtp} disabled={isLoading} style={{ ...ui.btnPrimary, opacity: isLoading ? 0.8 : 1 }}>
+                {isLoading ? 'Sending...' : 'Send OTP'}
               </button>
             </>
           )}
+
+          {otpSent && (
+            <div style={ui.stack}>
+              <div style={ui.field}>
+                <label htmlFor="pc-otp" style={ui.label}>Enter OTP</label>
+                <input
+                  id="pc-otp"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
+                  onFocus={(ev) => { setFOtp(true); scrollIntoViewOnFocus(ev); }}
+                  onBlur={() => setFOtp(false)}
+                  placeholder="6-digit code"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\\d*"
+                  autoComplete="one-time-code"
+                  enterKeyHint="done"
+                  style={{ ...ui.input, ...(fOtp ? ui.inputFocus : null) }}
+                />
+              </div>
+              <div style={ui.helperRow}>
+                <span style={ui.help}>{resendTimeout > 0 ? `Resend OTP in ${formatTime(resendTimeout)}` : `Didn't receive OTP?`}</span>
+                <button onClick={resendTimeout > 0 ? null : resendOtp} disabled={resendTimeout > 0} style={ui.linkBtn}>Resend OTP</button>
+              </div>
+              <button onClick={verifyOtpAndSave} disabled={isLoading} style={ui.btnPrimary}>
+                {isLoading ? 'Verifying...' : 'Verify and Save'}
+              </button>
+            </div>
+          )}
         </div>
-        <div id="recaptcha-container"></div>
       </div>
     </div>
   );

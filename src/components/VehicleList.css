@@ -1,56 +1,63 @@
 .vehicle-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-4);
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: var(--sp-4);
+  align-items: start;
 }
 
 .vehicle-card {
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px rgba(30,136,229,0.10);
-  padding: 1.5rem 1.2rem;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 1rem;
   text-decoration: none;
-  color: #222;
-  width: 260px;
-  transition: box-shadow 0.18s, transform 0.15s;
+  color: var(--text-900);
+  transition: box-shadow 0.18s, transform 0.15s, border-color 0.15s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--border-200);
+  width: 100%;
+  max-width: 360px;
 }
 .vehicle-card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07);
-  border-color: #007bff;
-  transform: translateY(-6px) scale(1.03);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-600);
+  transform: translateY(-4px) scale(1.02);
 }
 .vehicle-img {
   width: 100%;
   max-width: 210px;
   height: 140px;
   object-fit: cover;
-  border-radius: 0.7rem;
-  margin-bottom: 1rem;
-  background: #f8f9fa;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--sp-3);
+  background: var(--bg-100);
 }
 .vehicle-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   text-align: center;
 }
 .vehicle-meta {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  color: #1976d2;
-  font-size: 1rem;
-  margin-top: 0.5rem;
+  color: var(--accent-600);
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
 }
 .empty-msg {
   text-align: center;
-  color: #888;
+  color: var(--text-500);
   margin-top: 3rem;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 600px) {
+  .vehicle-img { height: 120px; }
+  .vehicle-title { font-size: 1rem; }
 }
