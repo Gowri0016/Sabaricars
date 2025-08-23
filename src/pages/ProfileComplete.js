@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, getRecaptchaVerifier } from '../firebase';
-import { signInWithPhoneNumber, getAuth } from 'firebase/auth';
+import { linkWithPhoneNumber } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export default function ProfileComplete() {
@@ -14,7 +14,7 @@ export default function ProfileComplete() {
 
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimeout, setResendTimeout] = useState(0);
-  const [recaptchaVerified, setRecaptchaVerified] = useState(false);
+  const [, setRecaptchaVerified] = useState(false);
   const timerRef = useRef(null);
   const navigate = useNavigate();
   // Focus states for inline focus styling
@@ -135,10 +135,15 @@ export default function ProfileComplete() {
     }
 
     try {
+      // Must have a currently signed-in user (e.g., Google) to link phone
+      const current = auth.currentUser;
+      if (!current) {
+        setError('Please sign in first before verifying phone.');
+        setIsLoading(false);
+        return;
+      }
       console.log('Creating invisible reCAPTCHA to send OTP');
       const fullPhone = `${countryCode}${cleanPhone}`;
-      // ensure verifier exists
-      const authInstance = auth || getAuth();
       // Always create a fresh invisible verifier so the badge doesn't persist across pages
       if (window.recaptchaVerifier) {
         try { window.recaptchaVerifier.clear(); } catch (_) {}
@@ -152,7 +157,8 @@ export default function ProfileComplete() {
       };
       window.recaptchaVerifier = getRecaptchaVerifier('recaptcha-container', params);
       try { await window.recaptchaVerifier.render(); } catch (e) { /* ignore */ }
-      const confirmationResult = await signInWithPhoneNumber(authInstance, fullPhone, window.recaptchaVerifier);
+      // Link phone to the current user rather than signing in as a new phone user
+      const confirmationResult = await linkWithPhoneNumber(current, fullPhone, window.recaptchaVerifier);
       window.confirmationResult = confirmationResult;
       console.log('OTP sent successfully');
       setOtpSent(true);
@@ -222,13 +228,16 @@ export default function ProfileComplete() {
         console.log('Phone number verified successfully');
         
         console.log('Saving user data to Firestore');
-        await setDoc(doc(db, 'users', user.uid), {
-          name: name.trim(),
-          phone: countryCode + phone,
+        const ref = doc(db, 'users', user.uid);
+        const payload = {
+          phone: `${countryCode}${phone}`,
           phoneVerified: true,
-          email: user.email,
           updatedAt: new Date().toISOString()
-        }, { merge: true });
+        };
+        const trimmedName = String(name || '').trim();
+        if (trimmedName) payload.name = trimmedName;
+        if (user.email) payload.email = user.email;
+        await setDoc(ref, payload, { merge: true });
         
         console.log('Profile completed successfully');
         setIsLoading(false);

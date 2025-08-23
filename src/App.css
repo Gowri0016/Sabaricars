@@ -6,6 +6,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Layout variables */
+:root {
+  --header-height: 60px;
+  --bottom-nav-height: 60px; /* used by bottom nav + main bottom padding */
+  --container-max: 1200px;
+}
+
 /* Global responsive helpers */
 img, picture, video, iframe {
   max-width: 100%;
@@ -170,8 +177,19 @@ h1 {
     cursor: pointer;
     z-index: 1002;
   }
+  /* Make header fixed on mobile */
   .navbar {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+  }
+  /* Ensure page content starts below the fixed header */
+  main {
+    padding-top: calc(var(--header-height) + 10px);
   }
 }
 .hamburger {

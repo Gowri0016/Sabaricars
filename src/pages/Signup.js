@@ -19,20 +19,23 @@ function Signup() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const u = result.user;
-      await setDoc(doc(db, 'users', u.uid), {
-        email: u.email || null,
-        name: u.displayName || '',
-        photoURL: u.photoURL || null,
-        phone: u.phoneNumber || null,
-        createdAt: new Date()
-      }, { merge: true });
+      const ref = doc(db, 'users', u.uid);
+      const snap = await getDoc(ref);
+      const existing = snap.exists() ? snap.data() : {};
+      const nowIso = new Date().toISOString();
+      const payload = { lastLoginAt: nowIso };
+      if (u.email) payload.email = u.email;
+      if (u.displayName) payload.name = u.displayName;
+      if (u.photoURL) payload.photoURL = u.photoURL;
+      if (u.phoneNumber) { payload.phone = u.phoneNumber; payload.phoneVerified = true; }
+      if (!existing.createdAt) payload.createdAt = nowIso;
+      await setDoc(ref, payload, { merge: true });
       // Decide destination based on existing data
-      const snap = await getDoc(doc(db, 'users', u.uid));
-      const data = snap.exists() ? snap.data() : {};
-      const hasName = !!(data.name && String(data.name).trim());
-      const hasPhone = !!(data.phone && String(data.phone).trim()) || !!u.phoneNumber;
+      const snap2 = await getDoc(doc(db, 'users', u.uid));
+      const data = snap2.exists() ? snap2.data() : {};
+      const hasName = !!(data.name && String(data.name).trim()) || !!(u.displayName && String(u.displayName).trim());
       const isVerified = data.phoneVerified === true || !!u.phoneNumber;
-      if (hasName && hasPhone && isVerified) {
+      if (hasName && isVerified) {
         navigate('/');
       } else {
         navigate('/profile-complete');
@@ -48,10 +51,15 @@ function Signup() {
     setSuccess('');
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email,
-        createdAt: new Date()
-      }, { merge: true });
+      const u = userCredential.user;
+      const ref = doc(db, 'users', u.uid);
+      const snap = await getDoc(ref);
+      const existing = snap.exists() ? snap.data() : {};
+      const nowIso = new Date().toISOString();
+      const payload = { };
+      if (email) payload.email = email;
+      if (!existing.createdAt) payload.createdAt = nowIso;
+      await setDoc(ref, payload, { merge: true });
       navigate('/profile-complete');
     } catch (err) {
       setError(err.message);
