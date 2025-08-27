@@ -18,7 +18,7 @@ function AdminLogin() {
       // Only allow verified admin accounts (check custom claim or email)
       const user = userCredential.user;
       // Change the allowed admin email here
-      if (user.emailVerified && user.email === 'www.7339596165@gmail.com') {
+      if (user.emailVerified && user.email === 'sabaricarsanthiyur9996@gmail.com') {
   navigate('/admin-panel');
       } else {
         setError('Access denied. Only verified admin accounts allowed.');
