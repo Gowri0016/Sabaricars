@@ -271,6 +271,24 @@ const VehicleDetails = () => {
                 <div className="spec-value">{vehicle.insuranceValidity}</div>
               </div>
             </div>
+            {vehicle.fitnessFC && (
+              <div className="spec-card">
+                <div className="spec-icon"><FiCheckCircle /></div>
+                <div className="spec-content">
+                  <div className="spec-label">Fitness / FC</div>
+                  <div className="spec-value">{vehicle.fitnessFC}</div>
+                </div>
+              </div>
+            )}
+            {vehicle.tyrePoint && (
+              <div className="spec-card">
+                <div className="spec-icon"><FiCheckCircle /></div>
+                <div className="spec-content">
+                  <div className="spec-label">Tyre Point</div>
+                  <div className="spec-value">{vehicle.tyrePoint}</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -406,4 +424,4 @@ const VehicleDetails = () => {
   );
 };
 
-export default VehicleDetails;
+export default VehicleDetails; 

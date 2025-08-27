@@ -8,7 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 function AddVehicle() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    name: '', category: '', price: '', year: '', variant: '', fuelType: '', transmission: '', owners: '', registration: '', insuranceValidity: '', odometer: '', description: '',
+    name: '', category: '', price: '', year: '', variant: '', fuelType: '', transmission: '', owners: '', registration: '', insuranceValidity: '', odometer: '', fitnessFC: '', tyrePoint: '', description: '',
   });
   const [categories, setCategories] = useState([]);
   useEffect(() => {
@@ -71,7 +71,7 @@ function AddVehicle() {
       // Store vehicle in subcollection named after category inside vehicleDetails
       await addDoc(collection(db, 'vehicleDetails', form.category, 'vehicles'), { ...form, images: imageUrls });
       setSuccess('Vehicle added successfully!');
-      setForm({ name: '', category: '', price: '', year: '', variant: '', fuelType: '', transmission: '', owners: '', registration: '', insuranceValidity: '', odometer: '', description: '' });
+      setForm({ name: '', category: '', price: '', year: '', variant: '', fuelType: '', transmission: '', owners: '', registration: '', insuranceValidity: '', odometer: '', fitnessFC: '', tyrePoint: '', description: '' });
       setImages([]);
     } catch (err) {
       console.error('Error in handleSubmit:', err);
@@ -162,6 +162,16 @@ function AddVehicle() {
           <div className="form-group">
             <label>Odometer Reading (km)</label>
             <input type="number" name="odometer" placeholder="Enter odometer reading" value={form.odometer} onChange={handleChange} min="0" />
+          </div>
+
+          <div className="form-group">
+            <label>Fitness / FC</label>
+            <input type="text" name="fitnessFC" placeholder="Enter fitness/FC details" value={form.fitnessFC} onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Tyre Point</label>
+            <input type="text" name="tyrePoint" placeholder="Enter tyre point details" value={form.tyrePoint} onChange={handleChange} />
           </div>
         </div>
 
