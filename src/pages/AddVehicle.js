@@ -145,7 +145,7 @@ function AddVehicle() {
           </div>
 
           <div className="form-group">
-            <label>Previous Owners</label>
+            <label>Owners</label>
             <input type="number" name="owners" placeholder="Number of previous owners" value={form.owners} onChange={handleChange} min="0" />
           </div>
 
