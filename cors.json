@@ -1,8 +1,13 @@
 [
   {
-    "origin": ["http://localhost:3000", "https://www.sabaricars.com"],
-    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "origin": [
+      "http://localhost:3000",
+      "https://www.sabaricars.com",
+      "https://sabaricars.com"
+    ],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type"]
+    "responseHeader": ["Content-Type", "Authorization"],
+    "allowCredentials": true
   }
 ]
