@@ -42,12 +42,31 @@ function AddVehicle() {
     setError('');
     setSuccess('');
     try {
+      if (!form.category) {
+        throw new Error('Please select a category');
+      }
+      
       let imageUrls = [];
       for (let img of images) {
-        const imgRef = ref(storage, `vehicles/${form.category}/${form.name}_${Date.now()}_${img.name}`);
-        await uploadBytes(imgRef, img);
-        const url = await getDownloadURL(imgRef);
-        imageUrls.push(url);
+        // Clean up the filename to remove special characters and spaces
+        const cleanFileName = img.name.replace(/[^a-zA-Z0-9.]/g, '_');
+        const imgRef = ref(storage, `vehicles/${form.category}/${Date.now()}_${cleanFileName}`);
+        
+        // Add metadata to help with CORS
+        const metadata = {
+          contentType: img.type,
+          cacheControl: 'public, max-age=31536000',
+        };
+        
+        try {
+          // Upload the file with metadata
+          await uploadBytes(imgRef, img, metadata);
+          const url = await getDownloadURL(imgRef);
+          imageUrls.push(url);
+        } catch (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          throw new Error(`Failed to upload image: ${img.name}. Please try again.`);
+        }
       }
       // Store vehicle in subcollection named after category inside vehicleDetails
       await addDoc(collection(db, 'vehicleDetails', form.category, 'vehicles'), { ...form, images: imageUrls });
@@ -55,7 +74,8 @@ function AddVehicle() {
       setForm({ name: '', category: '', price: '', year: '', variant: '', fuelType: '', transmission: '', owners: '', registration: '', insuranceValidity: '', odometer: '', description: '' });
       setImages([]);
     } catch (err) {
-      setError(err.message);
+      console.error('Error in handleSubmit:', err);
+      setError(err.message || 'Failed to add vehicle. Please try again.');
     }
     setLoading(false);
   };
