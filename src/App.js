@@ -28,9 +28,23 @@ import { AuthProvider } from './context/AuthContext';
 // Helper component for admin route protection
 function AdminRoute({ children }) {
   const { user } = useAuth();
-  // Replace this with your actual admin approval logic
-  const isApprovedAdmin = user && user.role === 'approvedadmin';
-  return isApprovedAdmin ? children : <AdminLogin />;
+  // Check if user is logged in and has admin email
+  const isAdmin = user && user.email === 'sabaricarsanthiyur9996@gmail.com';
+  
+  if (!user) {
+    return <AdminLogin />;
+  }
+  
+  if (!isAdmin) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Access Denied</h2>
+        <p>You don't have permission to access the admin panel.</p>
+      </div>
+    );
+  }
+  
+  return children;
 }
 
 

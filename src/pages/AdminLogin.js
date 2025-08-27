@@ -4,6 +4,7 @@ import './Admin.css';
 import { useNavigate } from 'react-router-dom';
 
 function AdminLogin() {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,19 +13,59 @@ function AdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Basic validation
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
     const auth = getAuth();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // Only allow verified admin accounts (check custom claim or email)
       const user = userCredential.user;
-      // Change the allowed admin email here
-      if (user.emailVerified && user.email === 'sabaricarsanthiyur9996@gmail.com') {
-  navigate('/admin-panel');
-      } else {
-        setError('Access denied. Only verified admin accounts allowed.');
+      
+      if (user.email !== 'sabaricarsanthiyur9996@gmail.com') {
+        setError(`Access denied. Email ${user.email} is not authorized for admin access.`);
+        await auth.signOut();
+        return;
       }
+      
+      if (!user.emailVerified) {
+        setError('Please verify your email before logging in. Check your inbox for the verification email.');
+        await auth.signOut();
+        return;
+      }
+      
+      navigate('/admin-panel');
+      
     } catch (err) {
-      setError(err.message);
+      let errorMessage = 'An error occurred during login. Please try again.';
+      
+      switch(err.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address format.';
+          break;
+        case 'auth/user-disabled':
+          errorMessage = 'This account has been disabled. Please contact support.';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email address.';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password. Please try again or reset your password.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed login attempts. Please try again later or reset your password.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = err.message || 'Login failed. Please try again.';
+      }
+      
+      setError(errorMessage);
     }
   };
 
@@ -76,6 +117,7 @@ function AdminLogin() {
               {error}
             </div>
           )}
+          
         </form>
       </div>
     </div>
