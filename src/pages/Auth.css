@@ -20,8 +20,8 @@
 .auth-container .success { color: var(--success-500); font-size: 0.95rem; margin-top: 0.5rem; }
 .google-btn { margin-top: 1rem; background: linear-gradient(135deg, var(--brand-900) 0%, #b21f1f 60%, var(--accent-amber) 100%); color: #fff; border: none; border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, filter 0.2s; box-shadow: var(--shadow-sm); }
 .google-btn:hover { transform: translateY(-2px); filter: brightness(1.02); }
-.modern-google { display: flex; align-items: center; justify-content: center; gap: 0.7rem; background: linear-gradient(90deg, #4285F4 0%, #34A853 33%, #FBBC05 66%, #EA4335 100%); color: #fff; font-size: 1.05rem; font-weight: 600; border: none; border-radius: var(--radius-pill); box-shadow: var(--shadow-md); padding: 0.85rem 2.2rem; margin-top: 1.2rem; letter-spacing: 0.2px; transition: transform 0.2s, filter 0.2s; }
-.auth-container .modern-google { background: linear-gradient(90deg, #4285F4 0%, #34A853 33%, #FBBC05 66%, #EA4335 100%) !important; color: #fff; border: none; }
+.modern-google { display: flex; align-items: center; justify-content: center; gap: 0.7rem; background: linear-gradient(90deg, #0f9d58 0%, #0b8043 100%); color: #fff; font-size: 1.05rem; font-weight: 600; border: none; border-radius: var(--radius-pill); box-shadow: var(--shadow-md); padding: 0.85rem 2.2rem; margin-top: 1.2rem; letter-spacing: 0.2px; transition: transform 0.2s, filter 0.2s; }
+.auth-container .modern-google { background: linear-gradient(90deg, #0f9d58 0%, #0b8043 100%) !important; color: #fff; border: none; }
 .modern-google:hover { transform: translateY(-2px) scale(1.03); box-shadow: var(--shadow-lg); }
 .auth-footer { margin-top: 1.25rem; text-align: center; font-size: 1rem; color: var(--text-600); }
 .auth-link { color: var(--accent-600); margin-left: 0.5rem; text-decoration: none; font-weight: 600; transition: color 0.2s; }

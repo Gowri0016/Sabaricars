@@ -6,6 +6,31 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .lg\:hidden {
+    display: none !important;
+  }
+  
+  .lg\:flex {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .mobile-only {
+    display: block !important;
+  }
+  
+  .desktop-only {
+    display: none !important;
+  }
+}
+
 /* Layout variables */
 :root {
   --header-height: 60px;
@@ -60,47 +85,311 @@ body {
 }
 
 
+/* Navbar Styles */
 .navbar {
-  background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 60%, #fdbb2d 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  box-shadow: var(--shadow-md);
+  padding: 0 1.25rem;
+  height: 70px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
   width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    padding: 0.75rem 1rem;
-  }
-}
 .navbar-brand {
+  display: flex;
+  align-items: center;
   font-size: 1.5rem;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  letter-spacing: 0.5px;
 }
 
-/* Keep logo inline with brand text (override global img display:block) */
+.navbar-brand:hover {
+  opacity: 0.9;
+}
+
 .navbar-brand img {
   display: inline-block;
   vertical-align: middle;
-  margin-right: 0.5rem;
-  width: 38px;
-  height: 38px;
-  object-fit: cover;
-  border-radius: 50%;
+  margin-right: 0.75rem;
+  height: 36px;
+  width: auto;
+  object-fit: contain;
 }
+
+/* Navigation Links */
 .navbar-links {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 0 1rem;
+  list-style: none;
+  flex: 1;
   justify-content: flex-end;
-  flex: 1 1 auto;
+  margin-right: 1rem;
+}
+
+.navbar-links a {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.navbar-links a:hover,
+.navbar-links a:focus {
+  color: #fff;
+}
+
+.navbar-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #fff;
+  transition: width 0.3s ease;
+}
+
+.navbar-links a:hover::after,
+.navbar-links a:focus::after {
+  width: 100%;
+}
+
+/* Login/Logout Buttons */
+.login-btn,
+.logout-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+  margin-left: 0.75rem;
+}
+
+.login-btn:hover,
+.logout-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.login-btn:active,
+.logout-btn:active {
+  transform: translateY(0);
+  background: #1e40af;
+}
+
+/* Mobile Menu Button - Single source of truth */
+button.hamburger {
+  display: none !important; /* Force hide by default */
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  width: 26px !important;
+  height: 18px !important; /* Slightly more height for better touch target */
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 1rem 0 0 !important;
+  z-index: 1001 !important;
+  position: relative !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  gap: 6px !important; /* Increased gap between lines */
+}
+
+button.hamburger .bar {
+  display: block !important;
+  width: 26px !important;
+  height: 2px !important;
+  background: #fff !important;
+  border-radius: 1px !important;
+  transition: all 0.3s ease !important;
+  transform-origin: center !important;
+  will-change: transform, opacity !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3) !important;
+}
+
+button.hamburger.active .bar:nth-child(1) {
+  transform: translateY(10px) rotate(45deg) !important;
+}
+
+button.hamburger.active .bar:nth-child(2) {
+  opacity: 0 !important;
+  transform: scale(0) !important;
+}
+
+button.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-10px) rotate(-45deg) !important;
+}
+
+/* Drawer Menu */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100%;
+  background: #1a1a1a;
+  padding: 5rem 1.5rem 2rem;
+  z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer.open {
+  right: 0;
+}
+
+/* Default styles for all drawer links and buttons */
+.drawer a,
+.drawer button {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  width: 100%;
+  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Specific styles for login button */
+.drawer .login-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: white !important;
+  font-weight: 500;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect for login button */
+.drawer .login-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  transform: translateY(-1px) scale(1.01) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Active state for login button */
+.drawer .login-btn:active {
+  transform: translateY(0) scale(0.99) !important;
+}
+
+.drawer a:hover,
+.drawer button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.drawer a:hover,
+.drawer button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsive Styles */
+@media (max-width: 1023px) {
+  .navbar {
+    padding: 0 1.25rem;
+  }
+  
+  button.hamburger {
+    display: flex !important;
+    margin-right: 1rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .navbar-links {
+    display: none;
+  }
+  
+  .drawer {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding-top: 5.5rem;
+  }
+  
+  .navbar-brand {
+    z-index: 1001;
+  }
+  
+  .navbar-brand img {
+    height: 32px;
+    width: auto;
+  }
+  
+  .drawer-backdrop {
+    backdrop-filter: blur(3px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .drawer,
+  .drawer-backdrop {
+    display: none !important;
+  }
+  
+  .hamburger {
+    display: none;
+  }
 }
 
 /* Keep the brand on a single line and avoid it wrapping to the next line */
@@ -191,57 +480,45 @@ h1 {
   main {
     padding-top: calc(var(--header-height) + 10px);
   }
-}
-.hamburger {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  gap: 5px;
-}
-.hamburger .bar {
-  width: 28px;
-  height: 4px;
-  background: #1a2a6c;
-  border-radius: 2px;
-  transition: 0.3s;
-}
-.drawer {
-  position: fixed;
-  top: 0;
-  right: -320px;
-  width: 280px;
-  height: 100vh;
-  background: #fff;
-  box-shadow: -2px 0 16px rgba(30,136,229,0.10);
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  z-index: 1001;
-  transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow-y: auto;
-}
-.drawer.open {
-  right: 0;
-}
-.drawer a, .drawer button {
-  margin: 1rem 0;
-  font-size: 1.15rem;
-  color: #1a2a6c;
-  text-decoration: none;
-  background: none;
-  border: none;
-  text-align: left;
-  padding: 0.5rem 0;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.drawer a:hover, .drawer button:hover {
-  color: #b21f1f;
-}
+
+  /* Drawer styles */
+  .drawer {
+    right: -320px;
+    width: 280px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 16px rgba(30,136,229,0.10);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    z-index: 1001;
+    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-y: auto;
+  }
+  
+  .drawer.open {
+    right: 0;
+  }
+  
+  .drawer a, 
+  .drawer button {
+    margin: 1rem 0;
+    font-size: 1.15rem;
+    color: #1a2a6c;
+    text-decoration: none;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 0.5rem 0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .drawer a:hover, 
+  .drawer button:hover {
+    color: #b21f1f;
+  }
 .close-btn {
   align-self: flex-end;
   font-size: 2rem;
@@ -338,3 +615,4 @@ main {
   right: 12px !important;
 }
 
+}

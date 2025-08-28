@@ -12,6 +12,10 @@ import AdminPanel from './pages/AdminPanel';
 import AddCategory from './pages/AddCategory';
 import AddVehicle from './pages/AddVehicle';
 import RegisterAdmin from './pages/RegisterAdmin';
+import Statistics from './pages/admin/Statistics';
+import Settings from './pages/admin/Settings';
+import ManageCategories from './pages/admin/ManageCategories';
+import VehicleManager from './pages/admin/VehicleManager';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import Categories from './pages/Categories';
@@ -51,13 +55,21 @@ function AdminRoute({ children }) {
 
 function App() {
   const { user } = useAuth();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
-    setIsSearchOpen(false);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (!isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    document.body.style.overflow = '';
   };
 
   const toggleSearch = (e) => {
@@ -69,42 +81,58 @@ function App() {
     <Router>
       <div className="App">
         <nav className="navbar">
-          <div className="navbar-brand">
-            <img src="/logo.png" alt="Sabari Cars Logo" style={{height: '38px', width: '38px', borderRadius: '50%', objectFit: 'cover', verticalAlign: 'middle', marginRight: '10px'}} />
+          <Link to="/" className="navbar-brand">
+            <img src="/logo.png" alt="Sabari Cars" />
             Sabari Cars
-          </div>
-          <div className="navbar-links desktop-only">
+          </Link>
+          
+          <div className="navbar-links">
             <Link to="/">Home</Link>
             <Link to="/categories">Categories</Link>
             <Link to="/wishlist">Wishlist</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/about">About Us</Link>
-            <Link to="/contact">Contact Us</Link>
-            <Link to="/request-vehicle">Request a Vehicle</Link>
-            <Link to="/sell-vehicle">Sell Your Vehicle</Link>
-            {!user && <Link to="/login">Login</Link>}
-            {user && <button className="logout-btn" onClick={() => auth.signOut()}>Logout</button>}
+            <Link to="/contact">Contact</Link>
+            <Link to="/request-vehicle" className="desktop-only">Request Vehicle</Link>
+            <Link to="/sell-vehicle" className="desktop-only">Sell Vehicle</Link>
+            {!user ? (
+              <Link to="/login" className="login-btn">Login</Link>
+            ) : (
+              <button className="logout-btn" onClick={() => auth.signOut()}>Logout</button>
+            )}
           </div>
-          <button className="hamburger mobile-only" onClick={handleDrawerToggle} aria-label="Open menu">
+          
+          <button 
+            className={`hamburger ${isMenuOpen ? 'active' : ''}`} 
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          >
             <span className="bar"></span>
             <span className="bar"></span>
             <span className="bar"></span>
           </button>
         </nav>
-        <div className={`drawer ${drawerOpen ? 'open' : ''}`}>
-          <button className="close-btn" onClick={handleDrawerClose} aria-label="Close menu">&times;</button>
-          <Link to="/" onClick={handleDrawerClose}>Home</Link>
-          <Link to="/categories" onClick={handleDrawerClose}>Categories</Link>
-          <Link to="/wishlist" onClick={handleDrawerClose}>Wishlist</Link>
-          <Link to="/profile" onClick={handleDrawerClose}>Profile</Link>
-          <Link to="/about" onClick={handleDrawerClose}>About Us</Link>
-          <Link to="/contact" onClick={handleDrawerClose}>Contact Us</Link>
-          <Link to="/request-vehicle" onClick={handleDrawerClose}>Request a Vehicle</Link>
-          <Link to="/sell-vehicle" onClick={handleDrawerClose}>Sell Your Vehicle</Link>
-          {!user && <Link to="/login" onClick={handleDrawerClose}>Login</Link>}
-          {user && <button className="logout-btn" onClick={() => {auth.signOut(); handleDrawerClose();}}>Logout</button>}
+        {/* Mobile Menu Drawer */}
+        <div className={`drawer ${isMenuOpen ? 'open' : ''}`}>
+          <Link to="/" onClick={closeMenu}>Home</Link>
+          <Link to="/categories" onClick={closeMenu}>Categories</Link>
+          <Link to="/wishlist" onClick={closeMenu}>Wishlist</Link>
+          <Link to="/profile" onClick={closeMenu}>Profile</Link>
+          <Link to="/about" onClick={closeMenu}>About Us</Link>
+          <Link to="/contact" onClick={closeMenu}>Contact Us</Link>
+          <Link to="/request-vehicle" onClick={closeMenu}>Request a Vehicle</Link>
+          <Link to="/sell-vehicle" onClick={closeMenu}>Sell Your Vehicle</Link>
+          {!user ? (
+            <Link to="/login" className="login-btn" onClick={closeMenu}>Login</Link>
+          ) : (
+            <button className="logout-btn" onClick={() => { auth.signOut(); closeMenu(); }}>Logout</button>
+          )}
         </div>
-        {drawerOpen && <div className="drawer-backdrop" onClick={handleDrawerClose}></div>}
+        <div 
+          className={`drawer-backdrop ${isMenuOpen ? 'active' : ''}`} 
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
         <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         <main>
           <Routes>
@@ -122,6 +150,17 @@ function App() {
               <AdminRoute>
                 <AdminPanel />
               </AdminRoute>
+            }>
+              <Route index element={<AdminPanel />} />
+              <Route path="vehicles" element={<AdminPanel />} />
+              <Route path="categories" element={<AdminPanel />} />
+            </Route>
+            
+            {/* Keep old routes for backward compatibility */}
+            <Route path="/admin" element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
             } />
             <Route path="/admin/add-category" element={
               <AdminRoute>
@@ -133,7 +172,31 @@ function App() {
                 <AddVehicle />
               </AdminRoute>
             } />
-            <Route path="/register-admin" element={<RegisterAdmin />} />
+            <Route path="/admin/register-admin" element={
+              <AdminRoute>
+                <RegisterAdmin />
+              </AdminRoute>
+            } />
+            <Route path="/admin/statistics" element={
+              <AdminRoute>
+                <Statistics />
+              </AdminRoute>
+            } />
+            <Route path="/admin/settings" element={
+              <AdminRoute>
+                <Settings />
+              </AdminRoute>
+            } />
+            <Route path="/admin/manage-categories" element={
+              <AdminRoute>
+                <ManageCategories />
+              </AdminRoute>
+            } />
+            <Route path="/admin/manage-vehicles" element={
+              <AdminRoute>
+                <VehicleManager />
+              </AdminRoute>
+            } />
             <Route path="/profile-complete" element={<ProfileComplete />} />
             <Route path="/request-vehicle" element={<RequestVehicle />} />
             <Route path="/sell-vehicle" element={<SellVehicle />} />
