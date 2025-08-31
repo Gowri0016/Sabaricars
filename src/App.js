@@ -18,6 +18,7 @@ import Statistics from './pages/admin/Statistics';
 import Settings from './pages/admin/Settings';
 import ManageCategories from './pages/admin/ManageCategories';
 import VehicleManager from './pages/admin/VehicleManager';
+import EditVehicle from './pages/admin/EditVehicle';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import Categories from './pages/Categories';
@@ -158,8 +159,9 @@ function App() {
                 </AdminRoute>
               }>
                 <Route index element={<AdminPanel />} />
-                <Route path="vehicles" element={<AdminPanel />} />
-                <Route path="categories" element={<AdminPanel />} />
+                <Route path="vehicles" element={<VehicleManager />} />
+                <Route path="vehicles/edit/:category/:id" element={<EditVehicle />} />
+                <Route path="categories" element={<ManageCategories />} />
               </Route>
 
               {/* Keep old routes for backward compatibility */}

@@ -1,148 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { db, storage } from '../../firebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, collectionGroup } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, collectionGroup, doc } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaEdit, FaTrash, FaSave, FaTimes, FaSearch, FaCar, FaSpinner, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaCar, FaSpinner, FaFilter } from 'react-icons/fa';
 
-// Modal component for viewing and editing vehicle details
-const VehicleDetailsModal = ({ vehicle, onClose, onSave, isEditing, onToggleEdit, editForm, setEditForm }) => {
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
-        <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">{isEditing ? 'Edit Vehicle' : 'Vehicle Details'}</h2>
-          <button onClick={onClose} className="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Close modal">
-            <FaTimes className="text-xl" />
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {vehicle.images?.[0] && (
-            <div className="flex justify-center">
-              <img src={vehicle.images[0]} alt={vehicle.name} className="rounded-lg max-h-60 object-cover w-full" />
-            </div>
-          )}
-
-          {isEditing ? (
-            <form onSubmit={onSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input type="text" name="name" placeholder="Vehicle Name" className="p-3 border rounded-lg" value={editForm.name} onChange={handleInputChange} required />
-              <input type="number" name="price" placeholder="Price (₹)" className="p-3 border rounded-lg" value={editForm.price} onChange={handleInputChange} required />
-              <input type="number" name="year" placeholder="Year" className="p-3 border rounded-lg" value={editForm.year} onChange={handleInputChange} />
-              <input type="text" name="odometer" placeholder="Odometer (km)" className="p-3 border rounded-lg" value={editForm.odometer} onChange={handleInputChange} />
-              <select name="fuelType" className="p-3 border rounded-lg" value={editForm.fuelType} onChange={handleInputChange}>
-                <option>Petrol</option><option>Diesel</option><option>CNG</option><option>Electric</option>
-              </select>
-              <select name="transmission" className="p-3 border rounded-lg" value={editForm.transmission} onChange={handleInputChange}>
-                <option>Manual</option><option>Automatic</option>
-              </select>
-              <input type="text" name="owners" placeholder="Owners" className="p-3 border rounded-lg" value={editForm.owners} onChange={handleInputChange} />
-              <input type="text" name="registration" placeholder="Registration" className="p-3 border rounded-lg" value={editForm.registration} onChange={handleInputChange} />
-              <textarea name="description" placeholder="Description" rows="4" className="col-span-1 sm:col-span-2 p-3 border rounded-lg" value={editForm.description} onChange={handleInputChange} />
-
-              <div className="col-span-1 sm:col-span-2 flex gap-4 mt-4">
-                <button type="submit" className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                  <FaSave /> Save Changes
-                </button>
-                <button type="button" onClick={onToggleEdit} className="flex-1 flex items-center justify-center gap-2 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
-                  <FaTimes /> Cancel
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <p><strong className="font-semibold text-gray-700">Name:</strong> {vehicle.name}</p>
-              <p><strong className="font-semibold text-gray-700">Price:</strong> ₹{parseInt(vehicle.price).toLocaleString('en-IN')}</p>
-              <p><strong className="font-semibold text-gray-700">Year:</strong> {vehicle.year}</p>
-              <p><strong className="font-semibold text-gray-700">Odometer:</strong> {vehicle.odometer} km</p>
-              <p><strong className="font-semibold text-gray-700">Fuel Type:</strong> {vehicle.fuelType}</p>
-              <p><strong className="font-semibold text-gray-700">Transmission:</strong> {vehicle.transmission}</p>
-              <p><strong className="font-semibold text-gray-700">Owners:</strong> {vehicle.owners}</p>
-              <p><strong className="font-semibold text-gray-700">Registration:</strong> {vehicle.registration}</p>
-              <p><strong className="font-semibold text-gray-700">Description:</strong> {vehicle.description}</p>
-
-              <div className="flex gap-4 mt-6 pt-4 border-t border-gray-200">
-                <button onClick={onToggleEdit} className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                  <FaEdit /> Edit
-                </button>
-                <button onClick={onClose} className="flex-1 flex items-center justify-center gap-2 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
-                  <FaTimes /> Close
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Main component with a cleaner, simplified view
 const VehicleManager = () => {
   const [vehicles, setVehicles] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [modalVehicle, setModalVehicle] = useState(null);
-  const [isEditingModal, setIsEditingModal] = useState(false);
-  const [editForm, setEditForm] = useState({});
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [vehiclesSnapshot, categoriesSnapshot] = await Promise.all([
-        getDocs(collectionGroup(db, 'vehicles')),
-        getDocs(collection(db, 'categories'))
-      ]);
-
-      const vehiclesList = vehiclesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        category: doc.ref.parent.parent.id,
-        ...doc.data()
-      }));
-      setVehicles(vehiclesList);
-
-      const categoriesList = categoriesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name || doc.id
-      }));
-      setCategories(categoriesList);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!modalVehicle) return;
-
-    try {
-      const vehicleRef = doc(db, 'categories', modalVehicle.category, 'vehicles', modalVehicle.id);
-      await updateDoc(vehicleRef, { ...editForm, updatedAt: new Date().toISOString() });
-
-      setVehicles(prevVehicles => prevVehicles.map(v => (v.id === modalVehicle.id ? { ...v, ...editForm } : v)));
-      toast.success('Vehicle updated successfully!');
-      setModalVehicle({ ...modalVehicle, ...editForm }); // Update modal content
-      setIsEditingModal(false);
-    } catch (error) {
-      console.error('Error updating vehicle:', error);
-      toast.error('Failed to update vehicle');
-    }
-  };
+  const [showFilters, setShowFilters] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
   const handleDelete = async (vehicle) => {
     if (!window.confirm(`Are you sure you want to delete ${vehicle.name}?`)) return;
@@ -196,10 +68,7 @@ const VehicleManager = () => {
         return updatedVehicles;
       });
       
-      // Close the modal if it's open for the deleted vehicle
-      if (modalVehicle && modalVehicle.id === vehicle.id) {
-        setModalVehicle(null);
-      }
+      // No modal to close as we navigate to edit page for details
       
       toast.success('Vehicle and all associated images deleted successfully!');
     } catch (error) {
@@ -208,11 +77,37 @@ const VehicleManager = () => {
     }
   };
 
-  const openModal = (vehicle) => {
-    setModalVehicle(vehicle);
-    setIsEditingModal(false);
-    setEditForm(vehicle);
-  };
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [vehiclesSnapshot, categoriesSnapshot] = await Promise.all([
+        getDocs(collectionGroup(db, 'vehicles')),
+        getDocs(collection(db, 'categories'))
+      ]);
+
+      const vehiclesList = vehiclesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        category: doc.ref.parent.parent.id,
+        ...doc.data()
+      }));
+      setVehicles(vehiclesList);
+
+      const categoriesList = categoriesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name || doc.id
+      }));
+      setCategories(categoriesList);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const filteredVehicles = React.useMemo(() => {
     return vehicles.filter(vehicle => {
@@ -225,96 +120,167 @@ const VehicleManager = () => {
   }, [vehicles, searchTerm, selectedCategory]);
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
+    <div className="bg-gray-100 min-h-screen p-3 font-sans">
       <div className="max-w-7xl mx-auto">
-        <header className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+        <header className="bg-white rounded-xl shadow-sm p-4 mb-4">
+          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <FaCar className="text-blue-600" />
             Vehicle Inventory
           </h1>
-          <p className="text-gray-500 mt-2">Manage your vehicle listings with a clean, concise view.</p>
+          <p className="text-gray-500 text-xs mt-1">Manage your vehicle listings</p>
         </header>
 
-        <section className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="relative">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <section className="bg-white rounded-xl shadow-sm p-4 mb-4">
+          <div className="flex gap-2 mb-3">
+            <div className="relative flex-1">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
               <input
                 type="text"
-                placeholder="Search by name, Reg. no..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-blue-500"
+                placeholder="Search vehicles..."
+                className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <select
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-blue-500"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="p-2 bg-gray-100 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors"
+              aria-label="Toggle filters"
             >
-              <option value="all">All Categories</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
+              <FaFilter className="text-sm" />
+            </button>
           </div>
+          
+          {showFilters && (
+            <div className="mt-2 pt-3 border-t border-gray-100">
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-blue-500"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="all">All Categories</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </section>
 
         {isLoading ? (
-          <div className="text-center p-12 flex flex-col items-center">
-            <FaSpinner className="animate-spin text-4xl text-blue-600 mb-4" />
-            <p className="text-gray-600">Loading vehicles...</p>
+          <div className="text-center p-8 flex flex-col items-center">
+            <FaSpinner className="animate-spin text-2xl text-blue-600 mb-2" />
+            <p className="text-gray-600 text-xs">Loading vehicles...</p>
           </div>
         ) : (
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <section className="grid grid-cols-1 gap-3">
             {filteredVehicles.length > 0 ? (
               filteredVehicles.map((vehicle) => (
-                <article key={vehicle.id} className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl">
-                  <div className="relative h-52 bg-gray-200">
-                    {vehicle.images?.[0] ? (
-                      <img src={vehicle.images[0]} alt={vehicle.name} className="w-full h-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400">
-                        <FaCar className="text-5xl" />
+                <article 
+                  key={vehicle.id} 
+                  className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
+                  onClick={() => {
+                    const cat = encodeURIComponent(vehicle.category || '');
+                    const vid = encodeURIComponent(vehicle.id || '');
+                    if (!cat || !vid) {
+                      toast.error('Missing vehicle identifier');
+                      return;
+                    }
+                    navigate(`/admin-panel/vehicles/edit/${cat}/${vid}`);
+                  }}
+                >
+                  <div className="flex h-20 md:h-24 p-3 hover:bg-gray-50">
+                    {/* Image container */}
+                    <div className="w-20 md:w-24 h-full flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                      {vehicle.images?.[0] ? (
+                        <img 
+                          src={vehicle.images[0]} 
+                          alt={vehicle.name}
+                          className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '';
+                            e.target.parentElement.classList.add('flex', 'items-center', 'justify-center');
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-gray-300">
+                          <FaCar className="text-2xl" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 pl-4 flex flex-col justify-between overflow-hidden">
+                      <div>
+                        <div className="flex justify-between items-start">
+                          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 pr-2">{vehicle.name}</h3>
+                          <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+                            {vehicle.category || 'N/A'}
+                          </span>
+                        </div>
+                        
+                        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
+                          <div className="flex items-center">
+                            <span className="text-gray-500 w-10 inline-block">Year:</span>
+                            <span className="font-medium">{vehicle.year || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-gray-500 w-12 inline-block">KM:</span>
+                            <span className="font-medium">{vehicle.odometer ? vehicle.odometer.toLocaleString('en-IN') : 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-gray-500 w-10 inline-block">Fuel:</span>
+                            <span className="font-medium">{vehicle.fuelType || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-gray-500 w-12 inline-block">Trans:</span>
+                            <span className="font-medium">{vehicle.transmission || 'N/A'}</span>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md">{vehicle.category || 'N/A'}</div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{vehicle.name}</h3>
-                    <p className="text-gray-500 text-sm mb-4">{vehicle.year} • {vehicle.odometer} km</p>
-                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
-                      <span className="text-2xl font-extrabold text-blue-700">₹{parseInt(vehicle.price).toLocaleString('en-IN')}</span>
-                      <div className="flex gap-2">
-                        <button onClick={() => openModal(vehicle)} className="p-3 text-blue-600 rounded-full hover:bg-blue-100 transition-colors" title="View Details"><FaEye /></button>
-                        <button onClick={() => handleDelete(vehicle)} className="p-3 text-red-600 rounded-full hover:bg-red-100 transition-colors" title="Delete vehicle"><FaTrash /></button>
+                      
+                      <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
+                        <span className="text-sm font-bold text-blue-700">₹{parseInt(vehicle.price || 0).toLocaleString('en-IN')}</span>
+                        <div className="flex items-center gap-2">
+                          <Link 
+                            to={`/admin-panel/vehicles/edit/${encodeURIComponent(vehicle.category || '')}/${encodeURIComponent(vehicle.id || '')}`}
+                            className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-all flex items-center gap-1 border border-blue-100"
+                            role="button"
+                            aria-label={`Edit ${vehicle.name}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <FaEdit className="text-xs" /> Edit
+                          </Link>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(vehicle);
+                            }}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Delete"
+                            aria-label={`Delete ${vehicle.name}`}
+                          >
+                            <FaTrash className="text-sm" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </article>
               ))
             ) : (
-              <div className="col-span-full bg-white rounded-xl shadow-lg p-10 text-center">
-                <FaCar className="mx-auto text-6xl text-gray-300 mb-4" />
-                <p className="text-xl text-gray-500 font-semibold">No vehicles found</p>
-                <p className="text-gray-400 mt-2">Try adjusting your search filters.</p>
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <FaCar className="mx-auto text-4xl text-gray-300 mb-2" />
+                <p className="text-sm text-gray-500 font-semibold">No vehicles found</p>
+                <p className="text-gray-400 text-xs mt-1">Try adjusting your search filters</p>
               </div>
             )}
           </section>
         )}
-
-        {modalVehicle && (
-          <VehicleDetailsModal
-            vehicle={modalVehicle}
-            onClose={() => setModalVehicle(null)}
-            onSave={handleSave}
-            isEditing={isEditingModal}
-            onToggleEdit={() => setIsEditingModal(!isEditingModal)}
-            editForm={editForm}
-            setEditForm={setEditForm}
-          />
-        )}
-        <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnHover />
+        
+        {/* Modal removed: editing is done on the dedicated edit page */}
+        <ToastContainer position="bottom-center" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnHover />
       </div>
     </div>
   );

@@ -1,9 +1,16 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import './Admin.css';
 
 function AdminPanel() {
+  const location = useLocation();
+  const isBaseAdmin = location.pathname === '/admin-panel';
+
+  if (!isBaseAdmin) {
+    // Render nested routes like /admin-panel/vehicles and /admin-panel/vehicles/edit/:category/:id
+    return <Outlet />;
+  }
+
   return (
     <div className="admin-panel-container">
       <div className="admin-header">
@@ -19,7 +26,7 @@ function AdminPanel() {
             <p>Add new vehicles to your inventory</p>
           </Link>
           
-          <Link to="/admin/manage-vehicles" className="admin-card">
+          <Link to="/admin-panel/vehicles" className="admin-card">
             <div className="card-icon">📋</div>
             <h3>Manage Vehicles</h3>
             <p>View and edit all vehicles</p>
@@ -33,7 +40,7 @@ function AdminPanel() {
             <p>Create new vehicle categories</p>
           </Link>
           
-          <Link to="/admin/manage-categories" className="admin-card">
+          <Link to="/admin-panel/categories" className="admin-card">
             <div className="card-icon">🗂️</div>
             <h3>Manage Categories</h3>
             <p>View and edit all categories</p>
