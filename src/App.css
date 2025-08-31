@@ -616,3 +616,27 @@ main {
 }
 
 }
+
+/* Scoped styles to clamp admin vehicle list avatar size */
+.vehicle-list .vehicle-row .vehicle-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 9999px !important; /* full circle */
+}
+
+@media (min-width: 768px) {
+  .vehicle-list .vehicle-row .vehicle-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+}

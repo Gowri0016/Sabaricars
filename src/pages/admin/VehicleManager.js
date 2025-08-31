@@ -14,6 +14,7 @@ const VehicleManager = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState('all');
   const navigate = useNavigate();
 
   const handleDelete = async (vehicle) => {
@@ -110,75 +111,53 @@ const VehicleManager = () => {
   }, [fetchData]);
 
   const filteredVehicles = React.useMemo(() => {
-    return vehicles.filter(vehicle => {
-      const matchesSearch = ['name', 'registration', 'description'].some(field =>
-        vehicle[field]?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      const matchesCategory = selectedCategory === 'all' || vehicle.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [vehicles, searchTerm, selectedCategory]);
+    if (selectedVehicleId !== 'all') {
+      return vehicles.filter(v => v.id === selectedVehicleId);
+    }
+    return vehicles;
+  }, [vehicles, selectedVehicleId]);
 
   return (
-    <div className="bg-gray-100 min-h-screen p-3 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <header className="bg-white rounded-xl shadow-sm p-4 mb-4">
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+    <div className="bg-gray-50 min-h-screen font-sans">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4">
+        {/* Page Header */}
+        <header className="py-3">
+          <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <FaCar className="text-blue-600" />
-            Vehicle Inventory
+            Manage Vehicles
           </h1>
-          <p className="text-gray-500 text-xs mt-1">Manage your vehicle listings</p>
+          <p className="text-gray-500 text-xs mt-0.5">Clean and mobile-friendly inventory management</p>
         </header>
 
-        <section className="bg-white rounded-xl shadow-sm p-4 mb-4">
-          <div className="flex gap-2 mb-3">
-            <div className="relative flex-1">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-              <input
-                type="text"
-                placeholder="Search vehicles..."
-                className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <button 
-              onClick={() => setShowFilters(!showFilters)}
-              className="p-2 bg-gray-100 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors"
-              aria-label="Toggle filters"
+        {/* Sticky Tools Bar - Single Dropdown */}
+        <section className="sticky top-0 z-10 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border border-gray-200 rounded-xl shadow-sm p-3 mb-3">
+          <div>
+            <label className="block text-[11px] text-gray-500 mb-1">Select Vehicle</label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-blue-500 bg-white"
+              value={selectedVehicleId}
+              onChange={(e) => setSelectedVehicleId(e.target.value)}
             >
-              <FaFilter className="text-sm" />
-            </button>
+              <option value="all">All vehicles</option>
+              {vehicles.map(v => (
+                <option key={v.id} value={v.id}>{v.name || 'Untitled'} {v.registration ? `• ${v.registration}` : ''}</option>
+              ))}
+            </select>
           </div>
-          
-          {showFilters && (
-            <div className="mt-2 pt-3 border-t border-gray-100">
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-blue-500"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
         </section>
 
         {isLoading ? (
-          <div className="text-center p-8 flex flex-col items-center">
+          <div className="text-center p-10 flex flex-col items-center">
             <FaSpinner className="animate-spin text-2xl text-blue-600 mb-2" />
             <p className="text-gray-600 text-xs">Loading vehicles...</p>
           </div>
         ) : (
-          <section className="grid grid-cols-1 gap-3">
+          <section className="grid grid-cols-1 gap-3 sm:gap-4 vehicle-list">
             {filteredVehicles.length > 0 ? (
               filteredVehicles.map((vehicle) => (
                 <article 
                   key={vehicle.id} 
-                  className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
+                  className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
                   onClick={() => {
                     const cat = encodeURIComponent(vehicle.category || '');
                     const vid = encodeURIComponent(vehicle.id || '');
@@ -189,14 +168,19 @@ const VehicleManager = () => {
                     navigate(`/admin-panel/vehicles/edit/${cat}/${vid}`);
                   }}
                 >
-                  <div className="flex h-20 md:h-24 p-3 hover:bg-gray-50">
-                    {/* Image container */}
-                    <div className="w-20 md:w-24 h-full flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                  {/* Chat-style row */}
+                  <div className="flex items-center p-3 hover:bg-gray-50 gap-3 vehicle-row">
+                    {/* Avatar */}
+                    <div
+                      className="flex-none shrink-0 rounded-full overflow-hidden bg-gray-100 border border-gray-200"
+                      style={{ width: 40, height: 40 }}
+                    >
                       {vehicle.images?.[0] ? (
                         <img 
                           src={vehicle.images[0]} 
                           alt={vehicle.name}
-                          className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                          className="vehicle-avatar block rounded-full object-cover object-center"
+                          style={{ width: 40, height: 40 }}
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = '';
@@ -204,68 +188,56 @@ const VehicleManager = () => {
                           }}
                         />
                       ) : (
-                        <div className="h-full flex items-center justify-center text-gray-300">
-                          <FaCar className="text-2xl" />
+                        <div className="h-full w-full flex items-center justify-center text-gray-300">
+                          <FaCar className="text-base md:text-lg" />
                         </div>
                       )}
                     </div>
                     
-                    {/* Content */}
-                    <div className="flex-1 pl-4 flex flex-col justify-between overflow-hidden">
-                      <div>
-                        <div className="flex justify-between items-start">
-                          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 pr-2">{vehicle.name}</h3>
-                          <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-                            {vehicle.category || 'N/A'}
-                          </span>
-                        </div>
-                        
-                        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
-                          <div className="flex items-center">
-                            <span className="text-gray-500 w-10 inline-block">Year:</span>
-                            <span className="font-medium">{vehicle.year || 'N/A'}</span>
+                    {/* Content (chat-style) */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="text-[13px] font-semibold text-gray-900 truncate">{vehicle.name}</h3>
+                            <span className="bg-blue-50 text-blue-700 text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+                              {vehicle.category || 'N/A'}
+                            </span>
                           </div>
-                          <div className="flex items-center">
-                            <span className="text-gray-500 w-12 inline-block">KM:</span>
-                            <span className="font-medium">{vehicle.odometer ? vehicle.odometer.toLocaleString('en-IN') : 'N/A'}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-gray-500 w-10 inline-block">Fuel:</span>
-                            <span className="font-medium">{vehicle.fuelType || 'N/A'}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-gray-500 w-12 inline-block">Trans:</span>
-                            <span className="font-medium">{vehicle.transmission || 'N/A'}</span>
+                          <div className="text-[11px] text-gray-600 mt-1 truncate">
+                            {vehicle.registration || 'No registration'} • {vehicle.fuelType || '—'} • {vehicle.transmission || '—'}
                           </div>
                         </div>
+                        <div className="text-[12px] font-semibold text-blue-700 whitespace-nowrap">₹{parseInt(vehicle.price || 0).toLocaleString('en-IN')}</div>
                       </div>
-                      
-                      <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
-                        <span className="text-sm font-bold text-blue-700">₹{parseInt(vehicle.price || 0).toLocaleString('en-IN')}</span>
-                        <div className="flex items-center gap-2">
-                          <Link 
-                            to={`/admin-panel/vehicles/edit/${encodeURIComponent(vehicle.category || '')}/${encodeURIComponent(vehicle.id || '')}`}
-                            className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-all flex items-center gap-1 border border-blue-100"
-                            role="button"
-                            aria-label={`Edit ${vehicle.name}`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <FaEdit className="text-xs" /> Edit
-                          </Link>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(vehicle);
-                            }}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                            title="Delete"
-                            aria-label={`Delete ${vehicle.name}`}
-                          >
-                            <FaTrash className="text-sm" />
-                          </button>
-                        </div>
+                      <div className="flex items-center gap-4 text-[10px] text-gray-500 mt-1">
+                        <span>Year: <strong className="text-gray-700">{vehicle.year || 'N/A'}</strong></span>
+                        <span>KM: <strong className="text-gray-700">{vehicle.odometer ? vehicle.odometer.toLocaleString('en-IN') : 'N/A'}</strong></span>
                       </div>
                     </div>
+                  </div>
+                  {/* Footer actions under the row */}
+                  <div className="flex justify-end items-center gap-2 px-3 pb-3 pt-2 border-t border-gray-100 bg-white/60">
+                    <Link 
+                      to={`/admin-panel/vehicles/edit/${encodeURIComponent(vehicle.category || '')}/${encodeURIComponent(vehicle.id || '')}`}
+                      className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all flex items-center gap-1 shadow-sm"
+                      role="button"
+                      aria-label={`Edit ${vehicle.name}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <FaEdit className="text-xs" /> Edit
+                    </Link>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(vehicle);
+                      }}
+                      className="px-2.5 py-1.5 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors flex items-center gap-1 border border-red-100"
+                      title="Delete"
+                      aria-label={`Delete ${vehicle.name}`}
+                    >
+                      <FaTrash className="text-sm" /> Delete
+                    </button>
                   </div>
                 </article>
               ))
@@ -279,7 +251,7 @@ const VehicleManager = () => {
           </section>
         )}
         
-        {/* Modal removed: editing is done on the dedicated edit page */}
+        {/* Notifications */}
         <ToastContainer position="bottom-center" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnHover />
       </div>
     </div>
