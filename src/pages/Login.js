@@ -10,6 +10,8 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [authInProgress, setAuthInProgress] = useState(false);
   const navigate = useNavigate();
 
   const checkProfileAndNavigate = async (user) => {
@@ -33,8 +35,13 @@ function Login() {
   };
 
   const handleGoogleLogin = async () => {
+    if (authInProgress) return; // Prevent multiple clicks
+    
     setError('');
     setSuccess('');
+    setIsLoading(true);
+    setAuthInProgress(true);
+    
     try {
       // Execute reCAPTCHA before Google login
       const token = await executeRecaptcha('GOOGLE_LOGIN');
@@ -43,6 +50,10 @@ function Login() {
       }
 
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account' // Force account selection to prevent auto-login issues
+      });
+      
       // If already signed in (e.g., via email), link Google to current user
       if (auth.currentUser) {
         const linkRes = await linkWithPopup(auth.currentUser, provider);
@@ -94,14 +105,42 @@ function Login() {
         }
         return;
       }
-      setError(err.message);
+      let errorMessage = 'Failed to sign in with Google';
+      
+      switch(err.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = 'Login was cancelled';
+          break;
+        case 'auth/cancelled-popup-request':
+        case 'auth/popup-blocked':
+          errorMessage = 'Popup was blocked. Please allow popups for this site.';
+          break;
+        case 'auth/account-exists-with-different-credential':
+          errorMessage = 'This email is already registered with a different sign-in method.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = err.message || 'Failed to sign in with Google';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setAuthInProgress(false);
     }
   };
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
+    if (isLoading || authInProgress) return;
+    
     setError('');
     setSuccess('');
+    setIsLoading(true);
+    setAuthInProgress(true);
+    
     try {
       // Execute reCAPTCHA before login
       const token = await executeRecaptcha('LOGIN');
@@ -130,7 +169,27 @@ function Login() {
       await setDoc(ref, payload, { merge: true });
       await checkProfileAndNavigate(u);
     } catch (err) {
-      setError(err.message);
+      let errorMessage = 'Login failed. Please try again.';
+      
+      switch(err.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          errorMessage = 'Invalid email or password';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many attempts. Please try again later or reset your password.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = err.message || 'Login failed. Please try again.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setAuthInProgress(false);
     }
   };
 
@@ -158,9 +217,23 @@ function Login() {
           required
           autoComplete="current-password"
         />
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login with Email</button>
+        <button 
+          type="submit" 
+          className="btn btn-primary" 
+          style={{ width: '100%' }}
+          disabled={isLoading || authInProgress}
+        >
+          {isLoading ? 'Signing in...' : 'Login with Email'}
+        </button>
       </form>
-      <button className="google-btn modern-google" onClick={handleGoogleLogin} aria-label="Login with Google">Login with Google</button>
+      <button 
+        className="google-btn modern-google" 
+        onClick={handleGoogleLogin} 
+        aria-label="Login with Google"
+        disabled={isLoading || authInProgress}
+      >
+        {isLoading ? 'Signing in...' : 'Login with Google'}
+      </button>
       <div className="auth-footer">
         <span>Don't have an account?</span>
         <a href="/signup" className="auth-link">Sign up!</a>

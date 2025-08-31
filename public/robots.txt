@@ -1,3 +1,46 @@
-# https://www.robotstxt.org/robotstxt.html
+# Sabari Cars - Robots.txt
+# Last updated: 2025-08-31
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemaps
+Sitemap: https://sabaricars.com/sitemap.xml
+
+# Disallow admin and sensitive areas
+Disallow: /admin/
+Disallow: /account/
+Disallow: /api/
+Disallow: /private/
+Disallow: /*?*
+Disallow: /*.json$
+Disallow: /*.xml$
+
+# Allow all other pages
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Crawl-delay: 10  # Uncomment if needed to reduce server load
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block AI crawlers that might be scraping content
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /

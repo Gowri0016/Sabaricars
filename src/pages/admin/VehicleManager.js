@@ -148,22 +148,63 @@ const VehicleManager = () => {
     if (!window.confirm(`Are you sure you want to delete ${vehicle.name}?`)) return;
 
     try {
-      if (vehicle.images?.length) {
-        await Promise.all(vehicle.images.map(imageUrl => {
-          const imageRef = ref(storage, imageUrl);
-          return deleteObject(imageRef).catch(imgError => console.error('Error deleting image:', imgError));
+      // Delete images from storage if they exist
+      if (vehicle.images?.length > 0) {
+        console.log('Deleting images for vehicle:', vehicle.id);
+        
+        await Promise.all(vehicle.images.map(async (imageUrl) => {
+          try {
+            console.log('Processing image URL:', imageUrl);
+            
+            // Handle both full URLs and storage paths
+            let path = imageUrl;
+            
+            // If it's a Firebase Storage URL (check for both domains)
+            if (imageUrl.includes('firebasestorage.googleapis.com') || imageUrl.includes('firebasestorage.app')) {
+              const pathStart = imageUrl.indexOf('/o/') + 3;
+              const pathEnd = imageUrl.indexOf('?');
+              if (pathStart > 2 && pathEnd > pathStart) {
+                path = decodeURIComponent(
+                  imageUrl
+                    .substring(pathStart, pathEnd)
+                    .replace(/%2F/g, '/')
+                );
+              }
+            }
+            
+            console.log('Deleting image with path:', path);
+            const imageRef = ref(storage, path);
+            await deleteObject(imageRef);
+            console.log('Successfully deleted image:', path);
+          } catch (imgError) {
+            console.error('Error deleting image:', imgError);
+            // Continue with other operations even if image deletion fails
+          }
         }));
       }
 
+      // Delete the document from Firestore
+      console.log('Deleting Firestore document for vehicle:', vehicle.id);
       const vehicleRef = doc(db, 'categories', vehicle.category, 'vehicles', vehicle.id);
       await deleteDoc(vehicleRef);
+      console.log('Successfully deleted Firestore document');
 
-      setVehicles(prevVehicles => prevVehicles.filter(v => v.id !== vehicle.id));
-      toast.success('Vehicle deleted successfully!');
-      setModalVehicle(null);
+      // Update the local state to remove the deleted vehicle
+      setVehicles(prevVehicles => {
+        const updatedVehicles = prevVehicles.filter(v => v.id !== vehicle.id);
+        console.log('Updated vehicles list:', updatedVehicles);
+        return updatedVehicles;
+      });
+      
+      // Close the modal if it's open for the deleted vehicle
+      if (modalVehicle && modalVehicle.id === vehicle.id) {
+        setModalVehicle(null);
+      }
+      
+      toast.success('Vehicle and all associated images deleted successfully!');
     } catch (error) {
-      console.error('Error deleting vehicle:', error);
-      toast.error('Failed to delete vehicle');
+      console.error('Error in handleDelete:', error);
+      toast.error(`Failed to delete vehicle: ${error.message}`);
     }
   };
 

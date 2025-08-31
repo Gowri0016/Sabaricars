@@ -10,13 +10,24 @@ function Signup() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [authInProgress, setAuthInProgress] = useState(false);
   const navigate = useNavigate();
 
   const handleGoogleSignup = async () => {
+    if (authInProgress) return; // Prevent multiple clicks
+    
     setError('');
     setSuccess('');
+    setIsLoading(true);
+    setAuthInProgress(true);
+    
     try {
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account' // Force account selection to prevent auto-login issues
+      });
+      
       const result = await signInWithPopup(auth, provider);
       const u = result.user;
       const ref = doc(db, 'users', u.uid);
@@ -47,8 +58,13 @@ function Signup() {
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
+    if (isLoading || authInProgress) return;
+    
     setError('');
     setSuccess('');
+    setIsLoading(true);
+    setAuthInProgress(true);
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const u = userCredential.user;
@@ -62,7 +78,29 @@ function Signup() {
       await setDoc(ref, payload, { merge: true });
       navigate('/profile-complete');
     } catch (err) {
-      setError(err.message);
+      let errorMessage = 'Sign up failed. Please try again.';
+      
+      switch(err.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'This email is already registered. Please log in instead.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Please choose a stronger password (at least 6 characters).';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = err.message || 'Sign up failed. Please try again.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setAuthInProgress(false);
     }
   };
 
@@ -90,9 +128,23 @@ function Signup() {
           required
           autoComplete="new-password"
         />
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Sign Up with Email</button>
+        <button 
+          type="submit" 
+          className="btn btn-primary" 
+          style={{ width: '100%' }}
+          disabled={isLoading || authInProgress}
+        >
+          {isLoading ? 'Creating account...' : 'Sign Up with Email'}
+        </button>
       </form>
-      <button className="google-btn modern-google" onClick={handleGoogleSignup} aria-label="Sign Up with Google">Sign Up with Google</button>
+      <button 
+        className="google-btn modern-google" 
+        onClick={handleGoogleSignup} 
+        aria-label="Sign Up with Google"
+        disabled={isLoading || authInProgress}
+      >
+        {isLoading ? 'Signing up...' : 'Sign Up with Google'}
+      </button>
       <div className="auth-footer">
         <span>Already have an account?</span>
         <a href="/login" className="auth-link">Login!</a>

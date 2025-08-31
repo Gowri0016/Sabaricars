@@ -4,14 +4,18 @@ import './Admin.css';
 import { useNavigate } from 'react-router-dom';
 
 function AdminLogin() {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [authInProgress, setAuthInProgress] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    if (isLoading || authInProgress) return;
+    
     setError('');
     
     // Basic validation
@@ -20,7 +24,10 @@ function AdminLogin() {
       return;
     }
 
+    setIsLoading(true);
+    setAuthInProgress(true);
     const auth = getAuth();
+    
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -66,6 +73,9 @@ function AdminLogin() {
       }
       
       setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setAuthInProgress(false);
     }
   };
 
@@ -107,8 +117,12 @@ function AdminLogin() {
             </div>
           </div>
 
-          <button type="submit" className="login-button">
-            Login to Dashboard
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={isLoading || authInProgress}
+          >
+            {isLoading ? 'Signing in...' : 'Login to Dashboard'}
           </button>
 
           {error && (
