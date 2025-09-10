@@ -5,7 +5,7 @@
   justify-content:center;
   width:100%;
   max-width:920px;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 0.5rem auto;
   padding: 0 8px;
 }
 
@@ -37,7 +37,7 @@
 @media (max-width:600px){
   .top-search{
     padding:0 6px;
-    margin-bottom:0.8rem;
+    margin-bottom:0.25rem;
   }
   .top-search-input{ padding:8px 10px; }
   .top-search-btn{ padding:8px 10px; }

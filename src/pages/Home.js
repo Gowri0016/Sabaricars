@@ -91,53 +91,78 @@ function Home() {
       setVehicles(filtered);
       setSearchTerm(term);
     } catch (err) {
-      console.error('Search error', err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+    return;
+  }
 
   const focusSearch = location.state && location.state.focusSearch;
 
   const renderContent = () => {
-    if (loading) {
-      return <div className="loading-spinner">Loading...</div>;
-    }
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      );
+    }
 
-    if (vehicles.length === 0) {
-      return (
-        <div className="no-results">
-          <p>No vehicles found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
-          {searchTerm && (
-            <p>Try searching with different keywords or browse our available vehicles.</p>
-          )}
-        </div>
-      );
-    }
+    if (vehicles.length === 0) {
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No vehicles found{searchTerm ? ` for "${searchTerm}"` : ''}
+          </h3>
+          {searchTerm ? (
+            <p className="text-gray-600">
+              Try searching with different keywords or browse our available vehicles.
+            </p>
+          ) : (
+            <p className="text-gray-600">
+              Check back later for new vehicle listings.
+            </p>
+          )}
+        </div>
+      );
+    }
 
-    return <VehicleList vehicles={vehicles} loading={loading} />;
-  };
+    return <VehicleList vehicles={vehicles} loading={loading} />;
+  };
 
   return (
-    <div className="page-container">
-      <SEO {...seoConfig} />
-      <div className="container">
-        <TopSearch onSearch={handleTopSearch} autoFocus={!!focusSearch} />
-        {searchTerm ? (
-          <div className="search-results-header">
-            <h2>Search Results for "{searchTerm}"</h2>
-            <p>{vehicles.length} vehicles found</p>
-          </div>
-        ) : (
-          <h2>Available Vehicles</h2>
-        )}
-        {renderContent()}
-      </div>
-      <div className="cta-section">
-        <h3>Can't find what you're looking for?</h3>
-        <button className="btn btn-primary">Contact Our Specialists</button>
-      </div>
-    </div>
+  <div className="min-h-screen bg-gray-50">
+  <SEO {...seoConfig} />
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <div className="mb-4">
+  <TopSearch onSearch={handleTopSearch} autoFocus={!!focusSearch} />
+  </div>
+  
+  <div className="mb-4">
+  {searchTerm ? (
+  <div className="mb-4">
+  <h2 className="text-2xl font-bold text-gray-900">Search Results for "{searchTerm}"</h2>
+  <p className="text-gray-600 mt-1">{vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'} found</p>
+  </div>
+  ) : (
+  <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Vehicles</h2>
+  )}
+  {renderContent()}
+  </div>
+
+  <div className="bg-white rounded-lg shadow-sm p-6 text-center mt-12 border border-gray-100">
+  <h3 className="text-lg font-medium text-gray-900 mb-3">Can't find what you're looking for?</h3>
+  <p className="text-gray-600 mb-4">Our specialists can help you find the perfect vehicle for your needs.</p>
+  <button 
+  className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+  onClick={() => window.location.href = '/contact'}
+  >
+  Contact Our Specialists
+  </button>
+  </div>
+  </div>
+  </div>
   );
 }
 

@@ -9,7 +9,9 @@ const VehicleList = ({ vehicles }) => {
   return (
     <div className="vehicle-list">
       {vehicles.map(vehicle => (
-        <VehicleCard vehicle={vehicle} key={vehicle.id} />
+        <div key={vehicle.id} className="vehicle-list-item">
+          <VehicleCard vehicle={vehicle} />
+        </div>
       ))}
     </div>
   );

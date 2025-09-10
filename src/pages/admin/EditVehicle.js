@@ -28,17 +28,9 @@ const EditVehicle = () => {
   useEffect(() => {
     const fetchVehicle = async () => {
       try {
-        // Try categories path first
-        let pathRoot = 'categories';
-        let docRef = doc(db, pathRoot, category, 'vehicles', id);
-        let docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-          // Fallback to vehicleDetails
-          pathRoot = 'vehicleDetails';
-          docRef = doc(db, pathRoot, category, 'vehicles', id);
-          docSnap = await getDoc(docRef);
-        }
+        // Use vehicleDetails path directly based on your Firestore structure
+        const docRef = doc(db, 'vehicleDetails', category, 'vehicles', id);
+        const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           setVehicle({
@@ -115,7 +107,7 @@ const EditVehicle = () => {
       console.error('Error removing image:', error);
       toast.error('Failed to remove image');
       // Refresh the vehicle data to restore the image
-      const docRef = doc(db, 'categories', category, 'vehicles', id);
+      const docRef = doc(db, 'vehicleDetails', category, 'vehicles', id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setVehicle(prev => ({
@@ -132,26 +124,15 @@ const EditVehicle = () => {
     try {
       const vehicleData = {
         ...vehicle,
-        price: parseFloat(vehicle.price) || 0,
+        price: vehicle.price,
         year: vehicle.year,
         odometer: vehicle.odometer,
         updatedAt: new Date().toISOString()
       };
 
-      // Try update on categories, then fallback to vehicleDetails
-      let updated = false;
-      try {
-        const vehicleRef1 = doc(db, 'categories', category, 'vehicles', id);
-        await updateDoc(vehicleRef1, vehicleData);
-        updated = true;
-      } catch (_) {
-        // ignore and try fallback
-      }
-      if (!updated) {
-        const vehicleRef2 = doc(db, 'vehicleDetails', category, 'vehicles', id);
-        await updateDoc(vehicleRef2, vehicleData);
-        updated = true;
-      }
+      // Update using the correct vehicleDetails path
+      const vehicleRef = doc(db, 'vehicleDetails', category, 'vehicles', id);
+      await updateDoc(vehicleRef, vehicleData);
       
       toast.success('Vehicle updated successfully');
       navigate('/admin-panel/vehicles');
@@ -194,18 +175,19 @@ const EditVehicle = () => {
                 <div className="sm:col-span-2">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Vehicle Images</h3>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-4">
                       {vehicle.images?.map((img, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={img}
                             alt={`${vehicle.name} ${index + 1}`}
-                            className="w-full h-24 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                            className="w-full h-64 object-cover rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+                            onClick={() => window.open(img, '_blank')}
                           />
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(index, img)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm hover:bg-red-600 transition-colors shadow-lg"
                             aria-label="Remove image"
                           >
                             ×
@@ -213,7 +195,7 @@ const EditVehicle = () => {
                         </div>
                       ))}
                       {vehicle.images?.length < 10 && (
-                        <label className="h-24 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="h-32 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                           <input
                             type="file"
                             className="hidden"
