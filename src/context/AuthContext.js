@@ -10,13 +10,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u && u.email === 'sabaricarsanthiyur9996@gmail.com' && u.emailVerified) {
-        setUser({ ...u, role: 'approvedadmin' });
-      } else {
-        setUser(u);
-      }
-      setLoading(false);
-    });
+  if (u && (u.email === 'sabaricarsanthiyur9996@gmail.com' || u.email === 'kumarsabari7@gmail.com') && u.emailVerified) {
+    setUser({ ...u, role: 'approvedadmin' });
+  } else {
+    setUser(u);
+  }
+  setLoading(false);
+});
     return () => unsubscribe();
   }, []);
 
