@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiPhone, FiMessageSquare, FiShare2, FiHeart } from 'react-icons/fi';
+import { FiArrowLeft, FiPhone, FiMessageSquare, FiShare2, FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { db } from '../firebase';
 import { collectionGroup, getDocs, doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
@@ -40,6 +40,17 @@ const VehicleDetails = () => {
     };
     fetchVehicle();
   }, [id]);
+
+  // Gallery navigation helpers
+  const hasImages = vehicle?.images && vehicle.images.length > 0;
+  const handleNextImage = () => {
+    if (!hasImages) return;
+    setActiveImage((prev) => (prev + 1) % vehicle.images.length);
+  };
+  const handlePrevImage = () => {
+    if (!hasImages) return;
+    setActiveImage((prev) => (prev - 1 + vehicle.images.length) % vehicle.images.length);
+  };
 
   // Fetch wishlist state
   useEffect(() => {
@@ -106,22 +117,7 @@ const VehicleDetails = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchVehicle = async () => {
-      const querySnapshot = await getDocs(collectionGroup(db, 'vehicles'));
-      let found = null;
-      querySnapshot.forEach(doc => {
-        if (doc.id === id) {
-          found = { id: doc.id, ...doc.data() };
-        }
-      });
-      if (found) {
-        setVehicle(found);
-      }
-      setLoading(false);
-    };
-    fetchVehicle();
-  }, [id]);
+  // Removed duplicate fetch useEffect (already handled above)
 
 
   if (loading) return (
@@ -200,6 +196,7 @@ const VehicleDetails = () => {
               <span>No Images Available</span>
             </div>
           )}
+          {/* Removed gallery navigation buttons as requested */}
         </div>
         {vehicle.images && vehicle.images.length > 1 && (
           <div className="thumbnail-container">
@@ -409,7 +406,7 @@ const VehicleDetails = () => {
         <motion.a
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          href={`https://wa.me/919025959996?text=I'm%20interested%20in%20your%20listing%20for%20the%20${vehicle.name || vehicle.make}`}
+          href={`https://wa.me/919025959996?text=${encodeURIComponent(`I'm interested in your listing for the ${vehicle.name || vehicle.make}`)}`}
           className="contact-btn whatsapp-btn"
           target="_blank"
           rel="noopener noreferrer"
