@@ -9,10 +9,12 @@ const VehicleCard = ({ vehicle }) => {
     navigate(`/vehicle/${vehicle.id}`);
   };
 
-  // Format price with commas
+  // Format price with commas (handles string/number)
   const formatPrice = (price) => {
     if (!price) return 'Price on request';
-    return `₹${price.toLocaleString('en-IN')}`;
+    let num = typeof price === 'number' ? price : Number(price.toString().replace(/[^\d]/g, ''));
+    if (isNaN(num)) return price;
+    return `₹${num.toLocaleString('en-IN')}`;
   };
 
   return (

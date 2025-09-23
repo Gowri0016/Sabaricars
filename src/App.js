@@ -27,6 +27,7 @@ import SearchOverlay from './components/SearchOverlay';
 import ScrollToTop from './components/ScrollToTop';
 import { useAuth } from './context/AuthContext';
 import { auth } from './firebase';
+import { FaUser, FaBars } from 'react-icons/fa';
 
 // Helper component for admin route protection
 function AdminRoute({ children }) {
@@ -53,6 +54,16 @@ function AdminRoute({ children }) {
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClick = (e) => {
+      if (!e.target.closest('.dropdown')) setIsDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isDropdownOpen]);
   const { user } = useAuth(); // Correctly get the user from context
 
   useEffect(() => {
@@ -90,20 +101,36 @@ function App() {
           <nav className="navbar">
             <Link to="/" className="navbar-brand">
               <img src="/logo.png" alt="Sabari Cars" />
-              Sabari Cars
             </Link>
 
-            <div className="navbar-links">
-              <Link to="/">Home</Link>
-              <Link to="/categories">Categories</Link>
-              <Link to="/wishlist">Wishlist</Link>
-              <Link to="/profile">Profile</Link>
-              <Link to="/about">About Us</Link>
-              <Link to="/contact">Contact</Link>
-              <Link to="/request-vehicle" className="desktop-only">Request Vehicle</Link>
-              <Link to="/sell-vehicle" className="desktop-only">Sell Vehicle</Link>
+            {/* Desktop Dropdown Menu */}
+            <div className="navbar-links desktop-dropdown">
+              <div className={`dropdown${isDropdownOpen ? ' open' : ''}`}> 
+                <button 
+                  className="dropdown-toggle" 
+                  onClick={() => setIsDropdownOpen((v) => !v)}
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
+                  title="Menu"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', padding: '0.5rem', fontSize: '1.5rem', color: '#222', cursor: 'pointer' }}
+                >
+                  <FaBars />
+                </button>
+                <div className="dropdown-menu">
+                  <Link to="/">Home</Link>
+                  <Link to="/categories">Categories</Link>
+                  <Link to="/wishlist">Wishlist</Link>
+                  <Link to="/profile">Profile</Link>
+                  <Link to="/about">About Us</Link>
+                  <Link to="/contact">Contact</Link>
+                  <Link to="/request-vehicle">Request Vehicle</Link>
+                  <Link to="/sell-vehicle">Sell Vehicle</Link>
+                </div>
+              </div>
               {!user ? (
-                <Link to="/login" className="login-btn">Login</Link>
+                <Link to="/login" className="login-btn" title="Login" style={{padding: '0.38rem 0.7rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <FaUser />
+                </Link>
               ) : (
                 <button className="logout-btn" onClick={() => auth.signOut()}>Logout</button>
               )}
@@ -211,33 +238,6 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          {/* Mobile Bottom Navigation */}
-          <div className="bottom-nav">
-            <Link to="/" className="bottom-nav-item">
-              <span className="nav-icon">🏠</span>
-              <span>Home</span>
-            </Link>
-            <Link to="/categories" className="bottom-nav-item">
-              <span className="nav-icon">📑</span>
-              <span>Categories</span>
-            </Link>
-            <Link to={{ pathname: '/' }} state={{ focusSearch: true }} className="bottom-nav-item">
-              <span className="nav-icon">🔍</span>
-              <span>Search</span>
-            </Link>
-            <Link to="/wishlist" className="bottom-nav-item">
-              <span className="nav-icon">❤️</span>
-              <span>Wishlist</span>
-            </Link>
-            <Link to="/request-vehicle" className="bottom-nav-item">
-              <span className="nav-icon">🚗</span>
-              <span>Request Vehicle</span>
-            </Link>
-            <Link to="/sell-vehicle" className="bottom-nav-item">
-              <span className="nav-icon">💸</span>
-              <span>Sell Vehicle</span>
-            </Link>
-          </div>
         </div>
       </Router>
     </HelmetProvider>

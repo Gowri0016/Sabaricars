@@ -65,7 +65,9 @@ const VehicleDetails = () => {
 
   const formatPrice = (price) => {
     if (!price) return '-';
-    return `₹${price.toLocaleString('en-IN')}`;
+    let num = typeof price === 'number' ? price : Number(price.toString().replace(/[^\d]/g, ''));
+    if (isNaN(num)) return price;
+    return `₹${num.toLocaleString('en-IN')}`;
   };
 
   const handleToggleFavorite = async () => {
@@ -155,240 +157,240 @@ const VehicleDetails = () => {
       {successMsg && (
         <div className="wishlist-success-msg">{successMsg}</div>
       )}
-      {/* Top Action Bar above Image */}
-      <div className="vehicle-top-actions">
-        <button 
-          className="back-btn"
-          onClick={() => navigate(-1)}
-        >
-          <FiArrowLeft className="icon" />
-        </button>
-        <button 
-          className="icon-btn share-btn"
-          onClick={handleShare}
-          aria-label="Share"
-        >
-          <FiShare2 className="icon" />
-        </button>
-        <button 
-          className={`icon-btn wishlist-btn${isFavorite ? ' active' : ''}`}
-          onClick={handleToggleFavorite}
-          aria-label="Add to Wishlist"
-          disabled={wishlistLoading}
-        >
-          <FiHeart className="icon" />
-        </button>
-      </div>
-
-      {/* Gallery Section with Thumbnails */}
-      <div className="gallery-section">
-        <div className="main-image-container">
-          {vehicle.images && vehicle.images.length > 0 ? (
-            <img
-              src={vehicle.images[activeImage]}
-              alt={`${vehicle.name || vehicle.make} ${activeImage + 1}`}
-              className="main-image"
-              loading="eager"
-            />
-          ) : (
-            <div className="image-placeholder">
-              <FiAlertCircle size={48} color="#b0b0b0" />
-              <span>No Images Available</span>
+      {/* Desktop grid: left = gallery, right = info. Mobile: stacked. */}
+      <div className="vehicle-details-gallery-col">
+        <div className="vehicle-top-actions">
+          <button 
+            className="back-btn"
+            onClick={() => navigate(-1)}
+          >
+            <FiArrowLeft className="icon" />
+          </button>
+          <button 
+            className="icon-btn share-btn"
+            onClick={handleShare}
+            aria-label="Share"
+          >
+            <FiShare2 className="icon" />
+          </button>
+          <button 
+            className={`icon-btn wishlist-btn${isFavorite ? ' active' : ''}`}
+            onClick={handleToggleFavorite}
+            aria-label="Add to Wishlist"
+            disabled={wishlistLoading}
+          >
+            <FiHeart className="icon" />
+          </button>
+        </div>
+        {/* Gallery Section with Thumbnails */}
+        <div className="gallery-section">
+          <div className="main-image-container">
+            {vehicle.images && vehicle.images.length > 0 ? (
+              <img
+                src={vehicle.images[activeImage]}
+                alt={`${vehicle.name || vehicle.make} ${activeImage + 1}`}
+                className="main-image"
+                loading="eager"
+              />
+            ) : (
+              <div className="image-placeholder">
+                <FiAlertCircle size={48} color="#b0b0b0" />
+                <span>No Images Available</span>
+              </div>
+            )}
+          </div>
+          {vehicle.images && vehicle.images.length > 1 && (
+            <div className="thumbnail-container">
+              {vehicle.images.map((img, idx) => (
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  key={idx}
+                  className={`thumbnail ${idx === activeImage ? 'active' : ''}`}
+                  onClick={() => setActiveImage(idx)}
+                >
+                  <img src={img} alt={`Thumbnail ${idx + 1}`} />
+                </motion.div>
+              ))}
             </div>
           )}
-          {/* Removed gallery navigation buttons as requested */}
         </div>
-        {vehicle.images && vehicle.images.length > 1 && (
-          <div className="thumbnail-container">
-            {vehicle.images.map((img, idx) => (
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                key={idx}
-                className={`thumbnail ${idx === activeImage ? 'active' : ''}`}
-                onClick={() => setActiveImage(idx)}
-              >
-                <img src={img} alt={`Thumbnail ${idx + 1}`} />
-              </motion.div>
-            ))}
-          </div>
-        )}
       </div>
-
-      {/* Vehicle Info Section - Full Width */}
-      <div className="vehicle-info-section">
-        <div className="vehicle-title-block">
-          <h1 className="vehicle-title">
-            {vehicle.name || `${vehicle.make} ${vehicle.model}`}
-            {vehicle.featured && <span className="featured-badge">Featured</span>}
-          </h1>
-          <div className="vehicle-subtitle">
-            <span className="variant"><FiSettings /> {vehicle.variant}</span>
-            <span className="detail"><FiCalendar /> {vehicle.year}</span>
-            <span className="detail"><FiDroplet /> {vehicle.fuelType}</span>
-            <span className="detail"><FiTrendingUp /> {vehicle.transmission}</span>
+      <div className="vehicle-details-info-col">
+        {/* Vehicle Info Section - Full Width */}
+        <div className="vehicle-info-section">
+          <div className="vehicle-title-block">
+            <h1 className="vehicle-title">
+              {vehicle.name || `${vehicle.make} ${vehicle.model}`}
+              {vehicle.featured && <span className="featured-badge">Featured</span>}
+            </h1>
+            <div className="vehicle-subtitle">
+              <span className="variant"><FiSettings /> {vehicle.variant}</span>
+              <span className="detail"><FiCalendar /> {vehicle.year}</span>
+              <span className="detail"><FiDroplet /> {vehicle.fuelType}</span>
+              <span className="detail"><FiTrendingUp /> {vehicle.transmission}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Price Tag */}
-        <div className="price-tag">
-          <div className="price-amount">{formatPrice(vehicle.price)}</div>
-          <div className="price-label">On-Road Price</div>
-        </div>
+          {/* Price Tag */}
+          <div className="price-tag">
+            <div className="price-amount">{formatPrice(vehicle.price)}</div>
+            <div className="price-label">On-Road Price</div>
+          </div>
 
-        {/* Key Specifications */}
-        <div className="specs-section">
-          <h2 className="section-title">Key Specifications</h2>
-          <div className="specs-grid">
-            <div className="spec-card">
-              <div className="spec-icon"><FiTrendingUp /></div>
-              <div className="spec-content">
-                <div className="spec-label">Odometer</div>
-                <div className="spec-value">{vehicle.odometer} km</div>
-              </div>
-            </div>
-            <div className="spec-card">
-              <div className="spec-icon"><FiUser /></div>
-              <div className="spec-content">
-                <div className="spec-label">Owners</div>
-                <div className="spec-value">{vehicle.owners}</div>
-              </div>
-            </div>
-            <div className="spec-card">
-              <div className="spec-icon"><FiMapPin /></div>
-              <div className="spec-content">
-                <div className="spec-label">Registration</div>
-                <div className="spec-value">{vehicle.registration}</div>
-              </div>
-            </div>
-            <div className="spec-card">
-              <div className="spec-icon"><FiShield /></div>
-              <div className="spec-content">
-                <div className="spec-label">Insurance</div>
-                <div className="spec-value">{vehicle.insuranceValidity}</div>
-              </div>
-            </div>
-            {vehicle.fitnessFC && (
+          {/* Key Specifications */}
+          <div className="specs-section">
+            <h2 className="section-title">Key Specifications</h2>
+            <div className="specs-grid">
               <div className="spec-card">
-                <div className="spec-icon"><FiCheckCircle /></div>
+                <div className="spec-icon"><FiTrendingUp /></div>
                 <div className="spec-content">
-                  <div className="spec-label">Fitness / FC</div>
-                  <div className="spec-value">{vehicle.fitnessFC}</div>
+                  <div className="spec-label">Odometer</div>
+                  <div className="spec-value">{vehicle.odometer} km</div>
                 </div>
               </div>
-            )}
-            {vehicle.tyrePoint && (
               <div className="spec-card">
-                <div className="spec-icon"><FiCheckCircle /></div>
+                <div className="spec-icon"><FiUser /></div>
                 <div className="spec-content">
-                  <div className="spec-label">Tyre Point</div>
-                  <div className="spec-value">{vehicle.tyrePoint}</div>
+                  <div className="spec-label">Owners</div>
+                  <div className="spec-value">{vehicle.owners}</div>
                 </div>
               </div>
-            )}
+              <div className="spec-card">
+                <div className="spec-icon"><FiMapPin /></div>
+                <div className="spec-content">
+                  <div className="spec-label">Registration</div>
+                  <div className="spec-value">{vehicle.registration}</div>
+                </div>
+              </div>
+              <div className="spec-card">
+                <div className="spec-icon"><FiShield /></div>
+                <div className="spec-content">
+                  <div className="spec-label">Insurance</div>
+                  <div className="spec-value">{vehicle.insuranceValidity}</div>
+                </div>
+              </div>
+              {vehicle.fitnessFC && (
+                <div className="spec-card">
+                  <div className="spec-icon"><FiCheckCircle /></div>
+                  <div className="spec-content">
+                    <div className="spec-label">Fitness / FC</div>
+                    <div className="spec-value">{vehicle.fitnessFC}</div>
+                  </div>
+                </div>
+              )}
+              {vehicle.tyrePoint && (
+                <div className="spec-card">
+                  <div className="spec-icon"><FiCheckCircle /></div>
+                  <div className="spec-content">
+                    <div className="spec-label">Tyre Point</div>
+                    <div className="spec-value">{vehicle.tyrePoint}</div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Condition Report */}
+          {vehicle.inspection && (
+            <div className="condition-section">
+              <h2 className="section-title">
+                <FiCheckCircle className="title-icon" />
+                Vehicle Condition Report
+              </h2>
+              <div className="condition-grid">
+                {Object.entries(vehicle.inspection).map(([key, value]) => (
+                  <div key={key} className="condition-item">
+                    <div className="condition-label">
+                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    </div>
+                    <div className={`condition-value ${value.toLowerCase()}`}>
+                      <div className={`status-dot ${value.toLowerCase()}`}></div>
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Refurbishment Details */}
+          {vehicle.refurbishment && (
+            <div className="refurb-section">
+              <h2 className="section-title">
+                <FiTrendingUp className="title-icon" />
+                Refurbishment Details
+              </h2>
+              <div className="refurb-list">
+                {Object.entries(vehicle.refurbishment).map(([key, value]) => (
+                  <div key={key} className="refurb-item">
+                    <div className="refurb-label">
+                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    </div>
+                    <div className="refurb-value">
+                      {Array.isArray(value) ? (
+                        <ul className="refurb-features">
+                          {value.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        value
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Finance Options */}
+          {vehicle.financial && (
+            <div className="finance-section">
+              <h2 className="section-title">
+                <FiDollarSign className="title-icon" />
+                Finance Options
+              </h2>
+              <div className="finance-cards">
+                {Object.entries(vehicle.financial).map(([key, value]) => (
+                  <div key={key} className="finance-card">
+                    <div className="finance-label">
+                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    </div>
+                    <div className="finance-value">
+                      {typeof value === 'boolean' ? (
+                        <span className={`availability ${value ? 'available' : 'unavailable'}`}>
+                          {value ? '✓ Available' : '✗ Not Available'}
+                        </span>
+                      ) : (
+                        value
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Video Walkthrough */}
+          {vehicle.visuals?.video && (
+            <div className="video-section">
+              <h2 className="section-title">
+                <FiVideo className="title-icon" />
+                Video Walkthrough
+              </h2>
+              <div className="video-wrapper">
+                <iframe
+                  src={vehicle.visuals.video}
+                  title="Vehicle Video Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Condition Report */}
-        {vehicle.inspection && (
-          <div className="condition-section">
-            <h2 className="section-title">
-              <FiCheckCircle className="title-icon" />
-              Vehicle Condition Report
-            </h2>
-            <div className="condition-grid">
-              {Object.entries(vehicle.inspection).map(([key, value]) => (
-                <div key={key} className="condition-item">
-                  <div className="condition-label">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  </div>
-                  <div className={`condition-value ${value.toLowerCase()}`}>
-                    <div className={`status-dot ${value.toLowerCase()}`}></div>
-                    {value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Refurbishment Details */}
-        {vehicle.refurbishment && (
-          <div className="refurb-section">
-            <h2 className="section-title">
-              <FiTrendingUp className="title-icon" />
-              Refurbishment Details
-            </h2>
-            <div className="refurb-list">
-              {Object.entries(vehicle.refurbishment).map(([key, value]) => (
-                <div key={key} className="refurb-item">
-                  <div className="refurb-label">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  </div>
-                  <div className="refurb-value">
-                    {Array.isArray(value) ? (
-                      <ul className="refurb-features">
-                        {value.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      value
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Finance Options */}
-        {vehicle.financial && (
-          <div className="finance-section">
-            <h2 className="section-title">
-              <FiDollarSign className="title-icon" />
-              Finance Options
-            </h2>
-            <div className="finance-cards">
-              {Object.entries(vehicle.financial).map(([key, value]) => (
-                <div key={key} className="finance-card">
-                  <div className="finance-label">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  </div>
-                  <div className="finance-value">
-                    {typeof value === 'boolean' ? (
-                      <span className={`availability ${value ? 'available' : 'unavailable'}`}>
-                        {value ? '✓ Available' : '✗ Not Available'}
-                      </span>
-                    ) : (
-                      value
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Video Walkthrough */}
-        {vehicle.visuals?.video && (
-          <div className="video-section">
-            <h2 className="section-title">
-              <FiVideo className="title-icon" />
-              Video Walkthrough
-            </h2>
-            <div className="video-wrapper">
-              <iframe
-                src={vehicle.visuals.video}
-                title="Vehicle Video Walkthrough"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        )}
       </div>
-
       {/* Sticky Contact Actions - Positioned above bottom nav */}
       <div className="sticky-contact-actions">
         <motion.a

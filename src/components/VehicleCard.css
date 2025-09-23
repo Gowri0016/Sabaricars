@@ -1,22 +1,25 @@
 /* VehicleCard.css - modern, mobile-first, professional styling */
+/* Modern yellow theme for vehicle card */
 .vehicle-card {
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  margin: 12px 0;
+  background: #fffbe6;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(255, 230, 0, 0.13), 0 2px 12px rgba(0,0,0,0.07);
+  margin: 16px 0;
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.22s, transform 0.18s;
   cursor: pointer;
+  border: 1.5px solid #ffe600;
 }
 .vehicle-card:hover {
-  box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+  box-shadow: 0 8px 32px rgba(255, 230, 0, 0.18), 0 6px 24px rgba(0,0,0,0.13);
+  transform: translateY(-2px) scale(1.012);
 }
 .vehicle-card__image-wrapper {
   width: 100%;
   aspect-ratio: 16/9;
-  background: #f4f4f4;
+  background: #fffde7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,11 +39,13 @@
 .vehicle-card__info {
   padding: 16px;
 }
+/* Card content and accent styles */
 .vehicle-card__name {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.13rem;
+  font-weight: 800;
   margin: 0 0 8px 0;
   color: #222;
+  letter-spacing: 0.01em;
 }
 .vehicle-card__details {
   display: flex;
@@ -50,11 +55,17 @@
   color: #555;
 }
 .vehicle-card__price {
-  color: #0a7cff;
-  font-weight: 600;
+  color: #bfa100;
+  font-weight: 700;
+  font-size: 1.08rem;
+  background: #fff9c4;
+  border-radius: 7px;
+  padding: 2px 10px;
+  margin-left: 6px;
+  letter-spacing: 0.01em;
 }
 .vehicle-card__year, .vehicle-card__fuel {
-  background: #f0f2f5;
+  background: #ffe60022;
   border-radius: 8px;
   padding: 2px 8px;
 }
@@ -67,7 +78,7 @@
 @media (max-width: 600px) {
   .vehicle-card {
     margin: 8px 0;
-    border-radius: 12px;
+    border-radius: 13px;
   }
   .vehicle-card__info {
     padding: 12px;

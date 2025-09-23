@@ -1,3 +1,68 @@
+/* Desktop Dropdown Menu Styles */
+.desktop-dropdown {
+  position: relative;
+}
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.dropdown-toggle {
+  background: #fffde7;
+  color: #b29600;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 1rem;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 214, 0, 0.08);
+}
+.dropdown-toggle:hover, .dropdown-toggle:focus {
+  background: #ffe066;
+  color: #222;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  min-width: 200px;
+  background: #ffd600;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  padding: 0.5rem 0;
+  z-index: 1002;
+  flex-direction: column;
+}
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu {
+  display: flex;
+}
+.dropdown-menu a {
+  color: #111 !important;
+  background: none;
+  padding: 0.65rem 1.25rem;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background 0.18s, color 0.18s;
+  display: block;
+  letter-spacing: 0.1px;
+}
+.dropdown-menu a:hover {
+  background: #ffd600;
+  color: #222;
+  /* Remove hover effect: keep same as normal */
+}
+@media (max-width: 1023px) {
+  .desktop-dropdown {
+    display: none !important;
+  }
+}
 /* Base styles */
 * {
   margin: 0;
@@ -87,8 +152,8 @@ body {
 
 /* Navbar Styles */
 .navbar {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #fff;
+  background: #ffd600;
+  color: #222;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -106,8 +171,8 @@ body {
   display: flex;
   align-items: center;
   font-size: 1.5rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: #222;
   text-decoration: none;
   transition: opacity 0.2s;
   letter-spacing: 0.5px;
@@ -120,8 +185,9 @@ body {
 .navbar-brand img {
   display: inline-block;
   vertical-align: middle;
-  margin-right: 0.75rem;
-  height: 36px;
+  margin: 0;
+  height: 100%;
+  max-height: 56px;
   width: auto;
   object-fit: contain;
 }
@@ -140,7 +206,7 @@ body {
 }
 
 .navbar-links a {
-  color: #e0e0e0;
+  color: #222;
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
@@ -152,7 +218,8 @@ body {
 
 .navbar-links a:hover,
 .navbar-links a:focus {
-  color: #fff;
+  background: #fffde7;
+  color: #b29600;
 }
 
 .navbar-links a::after {
@@ -174,8 +241,8 @@ body {
 /* Login/Logout Buttons */
 .login-btn,
 .logout-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+  background: #222;
+  color: #ffd600;
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
@@ -188,11 +255,6 @@ body {
   margin-left: 0.75rem;
 }
 
-.login-btn:hover,
-.logout-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-}
 
 .login-btn:active,
 .logout-btn:active {
@@ -209,6 +271,7 @@ button.hamburger {
   height: 18px !important; /* Slightly more height for better touch target */
   background: transparent !important;
   border: none !important;
+  box-shadow: none !important;
   cursor: pointer !important;
   padding: 0 !important;
   margin: 0 1rem 0 0 !important;
@@ -218,13 +281,19 @@ button.hamburger {
   -moz-appearance: none !important;
   appearance: none !important;
   gap: 6px !important; /* Increased gap between lines */
+@media (max-width: 1023px) {
+  button.hamburger {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
 }
 
 button.hamburger .bar {
   display: block !important;
   width: 26px !important;
   height: 2px !important;
-  background: #fff !important;
+  background: #000000 !important;
   border-radius: 1px !important;
   transition: all 0.3s ease !important;
   transform-origin: center !important;
@@ -249,7 +318,7 @@ button.hamburger.active .bar:nth-child(3) {
 }
 
 /* Drawer Menu */
-.drawer {
+ .drawer {
   position: fixed;
   top: 0;
   right: -300px;
@@ -265,10 +334,6 @@ button.hamburger.active .bar:nth-child(3) {
   gap: 0.5rem;
 }
 
-.drawer.open {
-  right: 0;
-}
-
 /* Default styles for all drawer links and buttons */
 .drawer a,
 .drawer button {
@@ -279,7 +344,7 @@ button.hamburger.active .bar:nth-child(3) {
   border-radius: 8px;
   transition: all 0.2s ease;
   text-align: left;
-  background: rgba(255, 255, 255, 0.05);
+    background: #ffd600;
   border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   width: 100%;
@@ -291,21 +356,22 @@ button.hamburger.active .bar:nth-child(3) {
 
 /* Specific styles for login button */
 .drawer .login-btn {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  color: white !important;
-  font-weight: 500;
+  background: #222 !important;
+  color: #ffd600 !important;
+  font-weight: 700;
   justify-content: center;
   margin-top: 1rem;
-  padding: 0.85rem 1rem;
+  padding: 0.7rem 1.1rem;
   border: none !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 /* Hover effect for login button */
 .drawer .login-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  background: #444 !important;
+  color: #ffd600 !important;
   transform: translateY(-1px) scale(1.01) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* Active state for login button */
@@ -539,50 +605,11 @@ h1 {
 }
 
 /* Bottom Navigation */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--card-bg);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 0 env(safe-area-inset-bottom);
-  min-height: var(--bottom-nav-height);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
-  z-index: 999;
-}
-
-.bottom-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: none;
-  border: none;
-  color: var(--text-500);
-  font-size: 0.75rem;
-  padding: 4px 0;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  text-decoration: none;
-  width: 25%;
-  justify-content: center;
-}
-
-.bottom-nav-item:hover,
-.bottom-nav-item:active {
-  color: var(--accent-600);
-}
-
-.nav-icon {
-  font-size: 1.5rem;
-  margin-bottom: 2px;
-}
 
 /* Adjust main content padding for bottom nav */
 main {
-  padding-bottom: calc(var(--bottom-nav-height) + 16px + env(safe-area-inset-bottom)) !important;
+    color: #111;
+    fill: #111;
 }
 
 /* Hide bottom nav on larger screens */
@@ -590,10 +617,10 @@ main {
   .bottom-nav {
     display: none;
   }
-  
-  main {
-    padding-bottom: 2rem !important;
-  }
+}
+
+main {
+  padding-bottom: 2rem !important;
 }
 
 /* Ensure Google reCAPTCHA badge/widget appears above fixed bottom navigation */
