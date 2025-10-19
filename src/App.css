@@ -192,6 +192,28 @@ body {
   object-fit: contain;
 }
 
+/* Header download button visible to the left of the brand and right of hamburger */
+.header-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #222 0%, #111 100%);
+  color: #ffd600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 0.75rem; /* sit right of the logo */
+  margin-right: 0.4rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.header-download:hover,
+.header-download:focus {
+  background: #111;
+  color: #fffde7;
+}
+
 /* Navigation Links */
 .navbar-links {
   display: flex;
@@ -214,6 +236,23 @@ body {
   position: relative;
   transition: color 0.2s;
   white-space: nowrap;
+}
+
+/* Download app button/link in navbar dropdown */
+.download-app {
+  display: inline-block;
+  background: #222;
+  color: #ffd600;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  margin: 0.35rem 0.6rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.download-app:hover,
+.download-app:focus {
+  background: #111;
+  color: #fffde7;
 }
 
 .navbar-links a:hover,
@@ -354,6 +393,25 @@ button.hamburger.active .bar:nth-child(3) {
   gap: 0.75rem;
 }
 
+/* Drawer download button specific styling */
+.drawer-download {
+  background: linear-gradient(90deg, #ffd600 0%, #ffb300 100%);
+  color: #111;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  /* hide drawer specific link on desktop since we have navbar download button */
+  .drawer-download {
+    display: none !important;
+  }
+}
+
 /* Specific styles for login button */
 .drawer .login-btn {
   background: #222 !important;
@@ -424,6 +482,16 @@ button.hamburger.active .bar:nth-child(3) {
   
   .navbar-links {
     display: none;
+  }
+
+  /* Keep header download visible on mobile as well; place it to the left of brand */
+  .header-download {
+    display: inline-flex;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.95rem;
+    order: 2; /* keep it after the brand */
   }
   
   .drawer {

@@ -5,8 +5,8 @@
   /* Brand */
   --brand-900: #1a2a6c;
   --brand-700: #2a3b8f;
-  --accent-600: #007bff;
-  --accent-500: #00c6ff;
+  --accent-600: #bfa100; /* primary yellow */
+  --accent-500: #ffe600; /* bright yellow */
   --accent-amber: #fdbb2d;
   --danger-500: #dc3545;
   --success-500: #28a745;
@@ -113,9 +113,12 @@ a:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6
   cursor: pointer;
 }
 .btn-primary {
-  background: linear-gradient(90deg, var(--accent-600), var(--accent-500));
-  color: #fff;
+  background: var(--accent-500);
+  color: #111;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.04);
 }
+.btn-primary:active { transform: translateY(0); opacity: 0.95; }
 .btn-primary:active { transform: translateY(0); opacity: 0.95; }
 
 /* Inputs */

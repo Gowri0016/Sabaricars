@@ -99,9 +99,31 @@ function App() {
         <ScrollToTop />
         <div className="App">
           <nav className="navbar">
+            <button
+              className={`hamburger ${isMenuOpen ? 'active' : ''}`}
+              onClick={toggleMenu}
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              <span className="bar"></span>
+              <span className="bar"></span>
+              <span className="bar"></span>
+            </button>
+
             <Link to="/" className="navbar-brand">
               <img src="/logo.png" alt="Sabari Cars" />
             </Link>
+
+            {/* Download button visible in header (to the right of the logo).
+                Uses a local APK placed in the public folder (e.g. public/sabari-cars.apk).
+                Ensure the APK file exists at the project root URL: /sabari-cars.apk */}
+            <a
+              href="/Sabari Cars.apk"
+              className="header-download"
+              title="Download App (Android)"
+              download="SabariCars.apk"
+            >
+              Download App
+            </a>
 
             {/* Desktop Dropdown Menu */}
             <div className="navbar-links desktop-dropdown">
@@ -125,6 +147,7 @@ function App() {
                   <Link to="/contact">Contact</Link>
                   <Link to="/request-vehicle">Request Vehicle</Link>
                   <Link to="/sell-vehicle">Sell Vehicle</Link>
+                  {/* Download link intentionally removed from dropdown - visible in header */}
                 </div>
               </div>
               {!user ? (
@@ -136,15 +159,7 @@ function App() {
               )}
             </div>
 
-            <button
-              className={`hamburger ${isMenuOpen ? 'active' : ''}`}
-              onClick={toggleMenu}
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              <span className="bar"></span>
-              <span className="bar"></span>
-              <span className="bar"></span>
-            </button>
+            
           </nav>
           {/* Mobile Menu Drawer */}
           <div className={`drawer ${isMenuOpen ? 'open' : ''}`}>
@@ -156,6 +171,8 @@ function App() {
             <Link to="/contact" onClick={closeMenu}>Contact Us</Link>
             <Link to="/request-vehicle" onClick={closeMenu}>Request a Vehicle</Link>
             <Link to="/sell-vehicle" onClick={closeMenu}>Sell Your Vehicle</Link>
+              {/* Download Android App for mobile drawer (local APK in public/) */}
+              <a href="/sabari-cars.apk" className="drawer-download" download="SabariCars.apk" onClick={closeMenu}>Download App (Android)</a>
             {!user ? (
               <Link to="/login" className="login-btn" onClick={closeMenu}>Login</Link>
             ) : (
