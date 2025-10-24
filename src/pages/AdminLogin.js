@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import './Admin.css';
 import { useNavigate } from 'react-router-dom';
+import { checkIsAdmin, isAuthorizedEmail } from '../utils/adminUtils';
 
 function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -29,17 +30,25 @@ function AdminLogin() {
     const auth = getAuth();
     
     try {
+      // First check if the email is in the authorized list
+      if (!isAuthorizedEmail(email)) {
+        setError('This email is not authorized for admin access.');
+        return;
+      }
+
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      if (user.email !== 'sabaricarsanthiyur9996@gmail.com') {
-        setError(`Access denied. Email ${user.email} is not authorized for admin access.`);
+      if (!user.emailVerified) {
+        setError('Please verify your email before logging in. Check your inbox for the verification email.');
         await auth.signOut();
         return;
       }
-      
-      if (!user.emailVerified) {
-        setError('Please verify your email before logging in. Check your inbox for the verification email.');
+
+      // Check if the user is in the admins collection
+      const isAdmin = await checkIsAdmin(user.email);
+      if (!isAdmin) {
+        setError('Access denied. Your account is not registered as an admin.');
         await auth.signOut();
         return;
       }

@@ -14,9 +14,11 @@ import AdminPanel from './pages/AdminPanel';
 import AddCategory from './pages/AddCategory';
 import AddVehicle from './pages/AddVehicle';
 import RegisterAdmin from './pages/RegisterAdmin';
+import FirstTimeAdminSetup from './pages/FirstTimeAdminSetup';
 import Statistics from './pages/admin/Statistics';
 import Settings from './pages/admin/Settings';
 import ManageCategories from './pages/admin/ManageCategories';
+import RequestedVehicles from './pages/admin/RequestedVehicles';
 import VehicleManager from './pages/admin/VehicleManager';
 import EditVehicle from './pages/admin/EditVehicle';
 import Wishlist from './pages/Wishlist';
@@ -29,14 +31,40 @@ import { useAuth } from './context/AuthContext';
 import { auth } from './firebase';
 import { FaUser, FaBars } from 'react-icons/fa';
 
+import { checkIsAdmin } from './utils/adminUtils';
+
 // Helper component for admin route protection
 function AdminRoute({ children }) {
   const { user } = useAuth();
-  // Check if user is logged in and has admin email
-  const isAdmin = user && user.email === 'sabaricarsanthiyur9996@gmail.com';
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        setIsChecking(false);
+        return;
+      }
+      
+      const adminStatus = await checkIsAdmin(user.email);
+      setIsAdmin(adminStatus);
+      setIsChecking(false);
+    };
+
+    checkAdmin();
+  }, [user]);
 
   if (!user) {
     return <AdminLogin />;
+  }
+
+  if (isChecking) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Checking permissions...</h2>
+      </div>
+    );
   }
 
   if (!isAdmin) {
@@ -197,6 +225,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/vehicle/:id" element={<VehicleDetails />} />
               <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/setup-admin" element={<FirstTimeAdminSetup />} />
               <Route path="/admin-panel" element={
                 <AdminRoute>
                   <AdminPanel />
@@ -237,6 +266,11 @@ function App() {
               <Route path="/admin/settings" element={
                 <AdminRoute>
                   <Settings />
+                </AdminRoute>
+              } />
+              <Route path="/admin/requested-vehicles" element={
+                <AdminRoute>
+                  <RequestedVehicles />
                 </AdminRoute>
               } />
               <Route path="/admin/manage-categories" element={
