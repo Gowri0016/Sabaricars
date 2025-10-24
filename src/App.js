@@ -21,6 +21,7 @@ import ManageCategories from './pages/admin/ManageCategories';
 import RequestedVehicles from './pages/admin/RequestedVehicles';
 import VehicleManager from './pages/admin/VehicleManager';
 import EditVehicle from './pages/admin/EditVehicle';
+import SellingVehicles from './pages/admin/SellingVehicles';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import Categories from './pages/Categories';
@@ -235,6 +236,7 @@ function App() {
                 <Route path="vehicles" element={<VehicleManager />} />
                 <Route path="vehicles/edit/:category/:id" element={<EditVehicle />} />
                 <Route path="categories" element={<ManageCategories />} />
+                <Route path="selling-vehicles" element={<SellingVehicles />} />
               </Route>
 
               {/* Keep old routes for backward compatibility */}
@@ -261,6 +263,11 @@ function App() {
               <Route path="/admin/statistics" element={
                 <AdminRoute>
                   <Statistics />
+                </AdminRoute>
+              } />
+              <Route path="/admin/selling-vehicles" element={
+                <AdminRoute>
+                  <SellingVehicles />
                 </AdminRoute>
               } />
               <Route path="/admin/settings" element={

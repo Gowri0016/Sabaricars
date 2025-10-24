@@ -53,6 +53,12 @@ function AdminPanel() {
           <p>View inventory statistics</p>
         </Link>
 
+        <Link to="/admin-panel/selling-vehicles" className="admin-card">
+          <div className="card-icon">💸</div>
+          <h3>Selling Vehicles</h3>
+          <p>View vehicles submitted via Sell Vehicle form</p>
+        </Link>
+
         <Link to="/admin/requested-vehicles" className="admin-card">
           <div className="card-icon">🔔</div>
           <h3>Requested Vehicles</h3>

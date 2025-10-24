@@ -1,7 +1,10 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SellVehicle.css';
+import { storage, db } from '../firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 function SellVehicle() {
   const [name, setName] = useState("");
@@ -10,11 +13,90 @@ function SellVehicle() {
   const [year, setYear] = useState("");
   const [price, setPrice] = useState("");
   const [desc, setDesc] = useState("");
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
-  const handleWhatsApp = () => {
-    const message = `Name: ${name}%0aPhone: ${phone}%0aVehicle: ${vehicle}%0aYear: ${year}%0aExpected Price: ${price}%0aDescription: ${desc}`;
-    const whatsappUrl = `https://wa.me/?text=${message}`;
-    window.open(whatsappUrl, '_blank');
+  const handleWhatsApp = async () => {
+    try {
+      setUploading(true);
+
+      // Upload images (if any) to Firebase Storage and collect URLs
+      let imageUrls = [];
+      if (images && images.length > 0) {
+        const uploadPromises = images.map(async (file) => {
+          const fileRef = storageRef(storage, `sell_vehicles/${Date.now()}_${file.name}`);
+          await uploadBytes(fileRef, file);
+          const url = await getDownloadURL(fileRef);
+          return url;
+        });
+
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      // Save details to Firestore (collection: 'sell')
+      try {
+        const record = {
+          name,
+          phone,
+          vehicle,
+          year,
+          price,
+          desc,
+          images: imageUrls,
+          createdAt: serverTimestamp(),
+        };
+
+        await addDoc(collection(db, 'sell'), record);
+      } catch (dbErr) {
+        console.error('Failed to save record to Firestore:', dbErr);
+      }
+
+      // Build message including image URLs (each on new line)
+      const parts = [
+        `Name: ${name}`,
+        `Phone: ${phone}`,
+        `Vehicle: ${vehicle}`,
+        `Year: ${year}`,
+        `Expected Price: ${price}`,
+        `Description: ${desc}`,
+      ];
+
+      if (imageUrls.length > 0) {
+        parts.push('Images:');
+        imageUrls.forEach((u) => parts.push(u));
+      }
+
+      const message = encodeURIComponent(parts.join('\n'));
+
+      // Using the specified WhatsApp number (9025959996)
+      const whatsappUrl = `https://wa.me/919025959996?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to upload images or open WhatsApp:', err);
+      // Still try to open chat with text-only info if upload failed
+      const fallback = encodeURIComponent(`Name: ${name}\nPhone: ${phone}\nVehicle: ${vehicle}\nYear: ${year}\nExpected Price: ${price}\nDescription: ${desc}`);
+      window.open(`https://wa.me/919025959996?text=${fallback}`, '_blank');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  useEffect(() => {
+    // cleanup object URLs when previews change/unmount
+    return () => {
+      previews.forEach((p) => URL.revokeObjectURL(p));
+    };
+  }, [previews]);
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    setImages(files);
+    // create preview URLs
+    const urls = files.map((f) => URL.createObjectURL(f));
+    // revoke previous previews
+    previews.forEach((p) => URL.revokeObjectURL(p));
+    setPreviews(urls);
   };
 
   return (
@@ -30,8 +112,15 @@ function SellVehicle() {
         <input type="text" placeholder="Year of Manufacture" value={year} onChange={e => setYear(e.target.value)} required />
         <input type="text" placeholder="Expected Price" value={price} onChange={e => setPrice(e.target.value)} required />
         <textarea placeholder="Additional Description" value={desc} onChange={e => setDesc(e.target.value)} rows={3} />
+        <label className="image-upload-label">Add Images (optional):</label>
+        <input type="file" accept="image/*" multiple onChange={handleImageChange} />
+        <div className="image-previews">
+          {previews.map((p, idx) => (
+            <img key={idx} src={p} alt={`preview-${idx}`} className="preview-img" />
+          ))}
+        </div>
         <button type="submit">
-          Send via WhatsApp
+          {uploading ? 'Uploading...' : 'Send via WhatsApp'}
         </button>
       </form>
     </div>
