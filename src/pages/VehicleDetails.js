@@ -396,7 +396,7 @@ const VehicleDetails = () => {
         <motion.a
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          href="tel:+919025959996"
+          href="tel:+919487749996"
           className="contact-btn call-btn"
         >
           <div className="btn-icon-circle">
@@ -408,7 +408,7 @@ const VehicleDetails = () => {
         <motion.a
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          href={`https://wa.me/919025959996?text=${encodeURIComponent(`I'm interested in your listing for the ${vehicle.name || vehicle.make}`)}`}
+          href={`https://wa.me/919487749996?text=${encodeURIComponent(`I'm interested in your listing for the ${vehicle.name || vehicle.make}`)}`}
           className="contact-btn whatsapp-btn"
           target="_blank"
           rel="noopener noreferrer"

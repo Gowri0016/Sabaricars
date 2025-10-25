@@ -69,14 +69,14 @@ function SellVehicle() {
 
       const message = encodeURIComponent(parts.join('\n'));
 
-      // Using the specified WhatsApp number (9025959996)
-      const whatsappUrl = `https://wa.me/919025959996?text=${message}`;
+      // Using the specified WhatsApp number (9487749996)
+      const whatsappUrl = `https://wa.me/919487749996?text=${message}`;
       window.open(whatsappUrl, '_blank');
     } catch (err) {
       console.error('Failed to upload images or open WhatsApp:', err);
       // Still try to open chat with text-only info if upload failed
       const fallback = encodeURIComponent(`Name: ${name}\nPhone: ${phone}\nVehicle: ${vehicle}\nYear: ${year}\nExpected Price: ${price}\nDescription: ${desc}`);
-      window.open(`https://wa.me/919025959996?text=${fallback}`, '_blank');
+      window.open(`https://wa.me/919487749996?text=${fallback}`, '_blank');
     } finally {
       setUploading(false);
     }
